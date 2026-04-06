@@ -1,0 +1,185 @@
+/* ═══════════════════════════════════════════════════════════════
+   RESPONSIVE OVERRIDES — Desktop & Tablet
+   Mobile-first: default styles handle smartphone (≤768px).
+   At ≥768px: sidebar nav, wider grids, centered cards.
+═══════════════════════════════════════════════════════════════ */
+
+/* ── Desktop shell ──────────────────────────────────────────── */
+@media (min-width: 768px) {
+  #root {
+    justify-content: flex-start;
+    background: #ece9f8;
+  }
+
+  .app-shell {
+    max-width: 100%;
+    box-shadow: none;
+    background: #F7F5FF;
+  }
+
+  /* All pages get left margin to clear the 220px sidebar */
+  .page {
+    margin-left: 220px;
+    padding-bottom: 32px;
+    min-height: 100dvh;
+  }
+  .page--no-nav {
+    margin-left: 0;
+  }
+}
+
+/* ── Desktop Sidebar Nav ──────────────────────────────────────── */
+@media (min-width: 768px) {
+  .bottom-nav {
+    position: fixed;
+    left: 0; top: 0;
+    width: 220px;
+    height: 100dvh;
+    max-width: 220px;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    padding: 0;
+    border-top: none;
+    border-right: 1px solid var(--border);
+    background: white;
+    transform: none !important;
+    box-shadow: 4px 0 20px rgba(45,42,74,0.06);
+    gap: 0;
+    z-index: 100;
+    overflow: hidden;
+  }
+
+  /* Show the brand header & footer (hidden on mobile via style="display:none") */
+  .nav-brand-desktop { display: flex !important; }
+  .nav-footer-desktop { display: block !important; }
+
+  .nav-item {
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 12px;
+    padding: 13px 20px;
+    border-radius: 0;
+    border-right: 3px solid transparent;
+    width: 100%;
+    transition: all var(--transition-fast);
+  }
+  .nav-item:hover {
+    background: var(--purple-50);
+    border-right-color: var(--purple-200);
+  }
+  .nav-item.active {
+    background: linear-gradient(90deg, var(--purple-50), var(--blue-50));
+    border-right-color: var(--purple-400);
+  }
+  .nav-item.active .nav-icon { color: var(--purple-500); }
+  .nav-item.active .nav-label { color: var(--purple-500); }
+
+  .nav-label { font-size: 14px; font-weight: 700; }
+  .nav-badge { position: static; margin-left: auto; flex-shrink: 0; }
+  .nav-icon { flex-shrink: 0; }
+}
+
+/* ── Discover – 3-col at 768px, 4-col at 1200px ────────────── */
+@media (min-width: 768px) {
+  .discover-header { padding: 32px 36px 28px !important; }
+  .discover-grid {
+    grid-template-columns: repeat(3, 1fr) !important;
+    padding: 24px 36px 40px !important;
+    gap: 20px !important;
+  }
+}
+@media (min-width: 1200px) {
+  .discover-grid { grid-template-columns: repeat(4, 1fr) !important; }
+}
+
+/* ── Page header wider padding on desktop ─────────────────── */
+@media (min-width: 768px) {
+  .page-header { padding: 20px 36px; }
+}
+
+/* ── Requests – base mobile (flex col) → desktop 2-col grid ──── */
+.requests-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+@media (min-width: 900px) {
+  .requests-content {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 16px !important;
+    align-items: start;
+  }
+}
+
+/* ── Modal – centered on desktop ─────────────────────────────── */
+@media (min-width: 768px) {
+  .modal-overlay {
+    align-items: center !important;
+    justify-content: center !important;
+  }
+  .modal-sheet {
+    max-width: 520px;
+    border-radius: var(--radius-xl) !important;
+    margin-bottom: 0;
+  }
+}
+
+/* ── Vetting / Onboarding – centered card on desktop ─────────── */
+@media (min-width: 768px) {
+  .vetting-outer {
+    min-height: 100dvh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--purple-50), var(--blue-50));
+    padding: 40px 20px;
+  }
+  .vetting-card {
+    width: 100%;
+    max-width: 480px;
+    background: white;
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+  }
+}
+
+/* ── Profile view – constrained width ────────────────────────── */
+@media (min-width: 768px) {
+  .profile-view-body { max-width: 680px; margin: 0 auto; }
+}
+
+/* ── My Profile – 2-col layout at 1000px+ ────────────────────── */
+@media (min-width: 1000px) {
+  .my-profile-content {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 20px !important;
+    align-items: start;
+    max-width: 960px;
+    margin: 0 auto;
+  }
+}
+
+/* ── Chat room – constrained width ───────────────────────────── */
+@media (min-width: 768px) {
+  .chat-room-wrapper { max-width: 800px; margin: 0 auto; }
+}
+
+/* ── CV Builder – constrained width ──────────────────────────── */
+@media (min-width: 768px) {
+  .cv-builder-wrapper { max-width: 640px; margin: 0 auto; }
+}
+
+/* ── Rooms list – constrained width ──────────────────────────── */
+@media (min-width: 768px) {
+  .rooms-list-wrapper { max-width: 680px; margin: 0 auto; }
+}
+
+/* ── Splash & Onboarding pages – no sidebar offset ───────────── */
+@media (min-width: 768px) {
+  .page--no-nav { margin-left: 0 !important; }
+}
