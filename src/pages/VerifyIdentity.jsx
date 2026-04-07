@@ -1,3 +1,4 @@
+import { supabase } from "../lib/supabase"
 import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -24,27 +25,62 @@ export default function VerifyIdentity() {
 
   const canProceed = ktpUploaded && selfieUploaded;
 
-  const handleKtp = (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setKtpUploaded(true);
-    setKtpFileName(file.name);
-  };
+  const handleKtp = async (e) => {
+    const file = e.target.files[0]
+    if (!file) return
 
-  const handleSelfie = (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setSelfieUploaded(true);
-    setSelfieFileName(file.name);
-  };
+    const { data: { user } } = await supabase.auth.getUser()
 
-  const handleSubmit = async () => {
-    if (!canProceed) {
-      alert("Semua file wajib diisi dulu.");
-      return;
+    const fileName = `${user.id}-ktp-${Date.now()}`
+
+    const { error } = await supabase.storage
+      .from('ktp')
+      .upload(fileName, file)
+
+    if (error) {
+      alert("Upload KTP gagal")
+      return
     }
 
-    setLoading(true);
+    const { data } = supabase.storage
+      .from('ktp')
+      .getPublicUrl(fileName)
+
+    await supabase
+      .from('profiles')
+      .update({ ktp_url: data.publicUrl })
+      .eq('id', user.id)
+
+    setKtpUploaded(true)
+  }
+
+  const handleSelfie = async (e) => {
+    const file = e.target.files[0]
+    if (!file) return
+
+    const { data: { user } } = await supabase.auth.getUser()
+
+    const fileName = `${user.id}-selfie-${Date.now()}`
+
+    const { error } = await supabase.storage
+      .from('selfie')
+      .upload(fileName, file)
+
+    if (error) {
+      alert("Upload selfie gagal")
+      return
+    }
+
+    const { data } = supabase.storage
+      .from('selfie')
+      .getPublicUrl(fileName)
+
+    await supabase
+      .from('profiles')
+      .update({ selfie_url: data.publicUrl })
+      .eq('id', user.id)
+
+    setSelfieUploaded(true)
 
     // sementara dulu, nanti gampang kita sambungkan ke Supabase
     setTimeout(() => {
