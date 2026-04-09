@@ -23,6 +23,23 @@ export default function VerifyIdentity() {
   const [selfieFileName, setSelfieFileName] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const handleSubmit = async () => {
+    setLoading(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        await supabase
+          .from('profiles')
+          .update({ verified: true })
+          .eq('id', user.id);
+      }
+    } catch (err) {
+      console.error('Verify submit error:', err);
+    }
+    setLoading(false);
+    navigate('/akad');
+  };
+
   const canProceed = ktpUploaded && selfieUploaded;
 
   const handleKtp = async (e) => {

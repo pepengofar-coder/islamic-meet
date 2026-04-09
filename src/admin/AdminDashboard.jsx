@@ -122,7 +122,7 @@ export default function AdminDashboard() {
       </div>
 
       {/* Chart + Gender ratio */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 2fr) minmax(0, 1fr)', gap: 20, marginBottom: 20, alignItems: 'start' }}>
+      <div className="admin-dashboard-charts" style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 2fr) minmax(0, 1fr)', gap: 20, marginBottom: 20, alignItems: 'start' }}>
         <motion.div className="admin-card" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
           <div className="admin-card-header">
             <div className="admin-card-title">

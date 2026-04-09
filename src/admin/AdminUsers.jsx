@@ -7,7 +7,7 @@ import {
   Mail, Calendar, RefreshCw, Shield, Crown,
 } from 'lucide-react';
 import AdminLayout from './AdminLayout';
-import { adminGetProfiles, adminVerifyUser, adminSuspendUser, adminSetMembership, resolveStatus } from '../lib/adminDB';
+import { adminGetProfiles, adminVerifyUser, adminSuspendUser, adminSetMembership, adminUpdateUserStatus, resolveStatus } from '../lib/adminDB';
 import { getTier } from '../lib/membership';
 import '../admin/admin.css';
 
@@ -101,6 +101,26 @@ export default function AdminUsers() {
       setAllUsers(prev => prev.map(u => u.id === userId ? { ...u, membership_tier: tier } : u));
       if (selectedUser?.id === userId) setSelectedUser(prev => ({ ...prev, membership_tier: tier }));
     } catch { alert('Gagal mengubah tier keanggotaan.'); }
+    setActionLoading(false);
+  };
+
+  const handleStatusChange = async (userId, newStatus) => {
+    setActionLoading(true);
+    try {
+      let updates = {};
+      switch (newStatus) {
+        case 'active':     updates = { verified: true, cv_done: true, suspended: false }; break;
+        case 'pending':    updates = { verified: true, cv_done: false, suspended: false }; break;
+        case 'unverified': updates = { verified: false, cv_done: false, suspended: false }; break;
+        case 'suspended':  updates = { suspended: true }; break;
+        default: return;
+      }
+      await adminUpdateUserStatus(userId, updates);
+      setAllUsers(prev => prev.map(u => u.id === userId ? { ...u, ...updates } : u));
+      if (selectedUser?.id === userId) setSelectedUser(prev => ({ ...prev, ...updates }));
+    } catch {
+      alert('Gagal mengubah status user.');
+    }
     setActionLoading(false);
   };
 
@@ -276,10 +296,27 @@ export default function AdminUsers() {
                           );
                         })()}
                       </td>
-                      <td>
-                        <span className={`admin-badge ${status === 'active' ? 'badge-active' : status === 'pending' ? 'badge-pending' : 'badge-unverif'}`}>
-                          {status === 'active' ? '✓ Aktif' : status === 'pending' ? '◌ Pending' : '! Belum Verif'}
-                        </span>
+                      <td onClick={e => e.stopPropagation()}>
+                        <select
+                          value={status}
+                          onChange={e => handleStatusChange(u.id, e.target.value)}
+                          disabled={actionLoading}
+                          style={{
+                            padding: '5px 8px', borderRadius: 8,
+                            border: `1.5px solid ${status === 'active' ? '#5EC994' : status === 'pending' ? '#F5A623' : status === 'suspended' ? '#999' : '#E07070'}`,
+                            background: status === 'active' ? '#E6F9F0' : status === 'pending' ? '#FFF3E0' : status === 'suspended' ? '#F5F5F5' : '#FFF0F0',
+                            color: status === 'active' ? '#1E7A50' : status === 'pending' ? '#8B5E00' : status === 'suspended' ? '#666' : '#8B0000',
+                            fontSize: 11, fontWeight: 800,
+                            fontFamily: "'Nunito', sans-serif",
+                            cursor: 'pointer', outline: 'none',
+                            appearance: 'auto',
+                          }}
+                        >
+                          <option value="active">✓ Aktif</option>
+                          <option value="pending">◌ Pending</option>
+                          <option value="unverified">! Belum Verif</option>
+                          <option value="suspended">⛔ Suspended</option>
+                        </select>
                       </td>
                       <td style={{ color: '#9896B0', fontSize: 12 }}>
                         {new Date(u.created_at).toLocaleDateString('id-ID', { year: 'numeric', month: 'short', day: 'numeric' })}

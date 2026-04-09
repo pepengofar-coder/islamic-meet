@@ -26,6 +26,15 @@
   .page--no-nav {
     margin-left: 0;
   }
+
+  /* Admin pages manage their own layout, no offset needed */
+  .app-shell--admin .page {
+    margin-left: 0;
+  }
+  .app-shell--admin {
+    max-width: 100% !important;
+    box-shadow: none !important;
+  }
 }
 
 /* ── Desktop Sidebar Nav ──────────────────────────────────────── */

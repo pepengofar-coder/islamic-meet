@@ -1,33 +1,42 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard, Users, MessageSquare, Send,
   Moon, LogOut, Menu, X, ChevronRight, Settings,
-  FileText,
+  FileText, CreditCard, Heart,
 } from 'lucide-react';
+import { adminGetBadgeCounts } from '../lib/adminDB';
 import '../admin/admin.css';
-
-const navItems = [
-  { section: 'UTAMA' },
-  { path: '/admin/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-  { path: '/admin/users', icon: Users, label: 'Pendaftar', badge: 3 },
-  { path: '/admin/rooms', icon: MessageSquare, label: 'Ruang Ta\'aruf' },
-  { path: '/admin/requests', icon: Send, label: 'Permintaan' },
-  { section: 'LAINNYA' },
-  { path: '/admin/reports', icon: FileText, label: 'Laporan' },
-];
 
 export default function AdminLayout({ children, title }) {
   const navigate = useNavigate();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [badges, setBadges] = useState({ unverifiedUsers: 0, pendingRequests: 0 });
+
+  // Load dynamic badge counts
+  useEffect(() => {
+    adminGetBadgeCounts()
+      .then(setBadges)
+      .catch(console.error);
+  }, [location.pathname]); // Refresh when navigating
+
+  const navItems = [
+    { section: 'UTAMA' },
+    { path: '/admin/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
+    { path: '/admin/users', icon: Users, label: 'Pendaftar', badge: badges.unverifiedUsers },
+    { path: '/admin/rooms', icon: MessageSquare, label: 'Ruang Ta\'aruf' },
+    { path: '/admin/requests', icon: Send, label: 'Permintaan', badge: badges.pendingRequests },
+    { path: '/admin/match', icon: Heart, label: 'Pasangkan Ta\'aruf' },
+    { section: 'LAINNYA' },
+    { path: '/admin/payments', icon: CreditCard, label: 'Pembayaran' },
+    { path: '/admin/reports', icon: FileText, label: 'Laporan' },
+  ];
 
   const handleLogout = () => {
     sessionStorage.removeItem('admin_auth');
     navigate('/admin');
   };
-
-  const avatarColors = ['#9B89CC', '#63A8D8', '#5EC994', '#F5A623', '#E07070'];
 
   return (
     <div className="admin-root">
@@ -36,7 +45,6 @@ export default function AdminLayout({ children, title }) {
         <div
           onClick={() => setSidebarOpen(false)}
           className="admin-sidebar-overlay"
-          style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', zIndex: 199 }}
         />
       )}
 
@@ -106,7 +114,6 @@ export default function AdminLayout({ children, title }) {
           <div style={{ display: 'flex', alignItems: 'center', gap: 14, minWidth: 0, flex: 1, overflow: 'hidden' }}>
             <button
               onClick={() => setSidebarOpen(s => !s)}
-              style={{ background: '#F0EEF8', border: 'none', borderRadius: 10, width: 36, height: 36, display: 'none', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', flexShrink: 0 }}
               className="sidebar-toggle"
             >
               <Menu size={18} color="#5E5A7A" />
@@ -118,10 +125,10 @@ export default function AdminLayout({ children, title }) {
           </div>
 
           <div className="admin-topbar-right">
-            <div style={{ fontSize: 13, color: '#5E5A7A', fontWeight: 600, padding: '6px 12px', background: '#F0EEF8', borderRadius: 10 }}>
+            <div className="admin-topbar-date">
               🕐 {new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
             </div>
-            <button onClick={() => navigate('/discover')} style={{ padding: '7px 14px', borderRadius: 10, border: '2px solid #E8E3FF', background: 'white', fontSize: 12, fontWeight: 700, color: '#5E5A7A', cursor: 'pointer', fontFamily: "'Nunito', sans-serif" }}>
+            <button onClick={() => navigate('/discover')} className="admin-topbar-app-btn">
               ← Lihat App
             </button>
           </div>

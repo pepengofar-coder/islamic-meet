@@ -10,6 +10,7 @@ export default function Register() {
   const [showPass, setShowPass] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [showConfirm, setShowConfirm] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -18,8 +19,8 @@ export default function Register() {
     setError('');
     try {
       await signUp({ email: form.email, password: form.password, name: form.name, gender: form.gender });
-      // Profile auto-created by DB trigger with name + gender from meta
-      navigate('/verify');
+      // Show confirmation modal before redirecting
+      setShowConfirm(true);
     } catch (err) {
       setError(
         err.message?.includes('already registered')
@@ -29,6 +30,11 @@ export default function Register() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleContinue = () => {
+    setShowConfirm(false);
+    navigate('/verify');
   };
 
   return (
@@ -202,6 +208,96 @@ export default function Register() {
           </p>
         </form>
       </motion.div>
+
+      {/* Registration Confirmation Modal */}
+      {showConfirm && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          style={{
+            position: 'fixed', inset: 0,
+            background: 'rgba(45,42,74,0.6)',
+            backdropFilter: 'blur(8px)',
+            zIndex: 200,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            padding: 24,
+          }}
+        >
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            transition={{ type: 'spring', damping: 22, stiffness: 260 }}
+            style={{
+              background: 'white', borderRadius: 28,
+              padding: '36px 28px', width: '100%', maxWidth: 380,
+              textAlign: 'center',
+              boxShadow: '0 24px 60px rgba(45,42,74,0.25)',
+            }}
+          >
+            {/* Success icon */}
+            <div style={{
+              width: 72, height: 72, borderRadius: '50%',
+              background: 'linear-gradient(135deg, #5EC994, #3DB878)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              margin: '0 auto 20px',
+              boxShadow: '0 8px 24px rgba(94, 201, 148, 0.35)',
+            }}>
+              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M20 6L9 17l-5-5" />
+              </svg>
+            </div>
+
+            <h2 style={{
+              fontFamily: "'Quicksand', sans-serif",
+              fontSize: 22, fontWeight: 700, color: '#2D2A4A',
+              marginBottom: 8,
+            }}>
+              Pendaftaran Berhasil! 🎉
+            </h2>
+
+            <p style={{ fontSize: 14, color: '#5E5A7A', lineHeight: 1.7, marginBottom: 6 }}>
+              Akun Anda telah berhasil didaftarkan dengan email:
+            </p>
+            <p style={{
+              fontSize: 14, fontWeight: 800, color: '#9B89CC',
+              background: '#F4F0FF', padding: '8px 16px', borderRadius: 10,
+              marginBottom: 16,
+            }}>
+              {form.email}
+            </p>
+
+            {/* Status info */}
+            <div style={{
+              background: '#FFF8E1', borderRadius: 14, padding: '14px 16px',
+              border: '1px solid #FFE082', marginBottom: 20, textAlign: 'left',
+            }}>
+              <p style={{ fontSize: 13, fontWeight: 700, color: '#795548', marginBottom: 4, display: 'flex', alignItems: 'center', gap: 6 }}>
+                ⏳ Status: Menunggu Verifikasi Admin
+              </p>
+              <p style={{ fontSize: 12, color: '#8D6E63', lineHeight: 1.5 }}>
+                Akun Anda akan diverifikasi oleh admin dalam 1×24 jam. Anda tetap bisa melanjutkan proses pendaftaran sambil menunggu.
+              </p>
+            </div>
+
+            {/* WhatsApp info */}
+            <div style={{
+              background: '#E8F5E9', borderRadius: 14, padding: '12px 16px',
+              border: '1px solid #A5D6A7', marginBottom: 20, textAlign: 'left',
+            }}>
+              <p style={{ fontSize: 12, color: '#2E7D32', lineHeight: 1.5 }}>
+                💬 Ada pertanyaan? Hubungi admin via WhatsApp: <strong>0814-6676-0017</strong>
+              </p>
+            </div>
+
+            <button
+              onClick={handleContinue}
+              className="btn btn-primary btn-full btn-lg"
+            >
+              Lanjutkan Pendaftaran →
+            </button>
+          </motion.div>
+        </motion.div>
+      )}
     </div>
   );
 }

@@ -115,10 +115,11 @@ export default function Requests() {
 
 function RequestCard({ profile, req, type, time, onView, onAccept, onReject, onOpenRoom }) {
   const statusConfig = {
-    pending:  { color: 'var(--warning)', bg: '#FFF3E0', icon: Clock, label: 'Menunggu' },
-    accepted: { color: 'var(--success)', bg: '#E6F9F0', icon: Check, label: 'Diterima' },
-    rejected: { color: 'var(--danger)', bg: '#FFEFEF', icon: X, label: 'Ditolak' },
-    sent:     { color: 'var(--blue-500)', bg: 'var(--blue-50)', icon: Send, label: 'Terkirim' },
+    pending:          { color: 'var(--warning)', bg: '#FFF3E0', icon: Clock, label: 'Menunggu' },
+    approved_by_user: { color: '#9B89CC',        bg: '#EAE3FF', icon: Clock, label: 'Menunggu Admin' },
+    accepted:         { color: 'var(--success)', bg: '#E6F9F0', icon: Check, label: 'Disetujui' },
+    rejected:         { color: 'var(--danger)',  bg: '#FFEFEF', icon: X, label: 'Ditolak' },
+    sent:             { color: 'var(--blue-500)',bg: 'var(--blue-50)', icon: Send, label: 'Terkirim' },
   };
   const sc = statusConfig[req.status] || statusConfig.pending;
   const StatusIcon = sc.icon;
@@ -132,10 +133,10 @@ function RequestCard({ profile, req, type, time, onView, onAccept, onReject, onO
         </div>
         <div style={{ flex: 1 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 2 }}>
-            <span style={{ fontSize: 15, fontWeight: 800, color: 'var(--text-primary)' }}>{profile.name.split(' ').slice(0, 2).join(' ')}</span>
+            <span style={{ fontSize: 15, fontWeight: 800, color: 'var(--text-primary)' }}>{(profile.name || '—').split(' ').slice(0, 2).join(' ')}</span>
             <MatchBadge score={profile.matchScore} size="sm" />
           </div>
-          <p style={{ fontSize: 12, color: 'var(--text-muted)' }}>{profile.age} th • {profile.city} • {time}</p>
+          <p style={{ fontSize: 12, color: 'var(--text-muted)' }}>{profile.age ? `${profile.age} th` : ''} • {profile.city || '—'} • {time}</p>
         </div>
         <div style={{ padding: '5px 10px', borderRadius: 20, background: sc.bg, display: 'flex', alignItems: 'center', gap: 5 }}>
           <StatusIcon size={12} color={sc.color} />
@@ -167,12 +168,22 @@ function RequestCard({ profile, req, type, time, onView, onAccept, onReject, onO
             </button>
           </>
         )}
+        {type === 'incoming' && req.status === 'approved_by_user' && (
+          <div style={{ width: '100%', padding: '10px 14px', borderRadius: 12, background: '#EAE3FF', textAlign: 'center' }}>
+            <p style={{ fontSize: 13, fontWeight: 700, color: '#7E6BAF' }}>⏳ Menunggu persetujuan admin untuk membuka ruang ta'aruf</p>
+          </div>
+        )}
         {type === 'incoming' && req.status === 'accepted' && (
           <button onClick={onOpenRoom} className="btn btn-primary btn-full btn-sm">
             Buka Ruang Ta'aruf →
           </button>
         )}
-        {type === 'outgoing' && (
+        {type === 'outgoing' && req.status === 'approved_by_user' && (
+          <div style={{ width: '100%', padding: '10px 14px', borderRadius: 12, background: '#EAE3FF', textAlign: 'center' }}>
+            <p style={{ fontSize: 13, fontWeight: 700, color: '#7E6BAF' }}>⏳ Diterima — menunggu persetujuan admin</p>
+          </div>
+        )}
+        {type === 'outgoing' && req.status !== 'approved_by_user' && (
           <button onClick={onView} className="btn btn-secondary btn-full btn-sm">
             Lihat Profil <ChevronRight size={14} />
           </button>

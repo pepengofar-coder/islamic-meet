@@ -2,30 +2,35 @@ import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from
 import { useEffect } from 'react';
 import { AppProvider, useApp } from './context/AppContext';
 
-import SplashScreen    from './pages/SplashScreen';
-import Onboarding      from './pages/Onboarding';
-import Register        from './pages/Register';
-import Login           from './pages/Login';
-import ForgotPassword  from './pages/ForgotPassword';
-import VerifyIdentity  from './pages/VerifyIdentity';
-import Akad            from './pages/Akad';
-import ReadinessTest   from './pages/ReadinessTest';
-import CVBuilder       from './pages/CVBuilder';
-import Discover        from './pages/Discover';
-import ProfileView     from './pages/ProfileView';
-import Requests        from './pages/Requests';
-import Rooms           from './pages/Rooms';
-import TaarufRoom      from './pages/TaarufRoom';
-import MyProfile       from './pages/MyProfile';
-import Pricing         from './pages/Pricing';
+import SplashScreen from './pages/SplashScreen';
+import Onboarding from './pages/Onboarding';
+import Register from './pages/Register';
+import Login from './pages/Login';
+import ForgotPassword from './pages/ForgotPassword';
+import VerifyIdentity from './pages/VerifyIdentity';
+import Akad from './pages/Akad';
+import ReadinessTest from './pages/ReadinessTest';
+import CVBuilder from './pages/CVBuilder';
+import Discover from './pages/Discover';
+import ProfileView from './pages/ProfileView';
+import Requests from './pages/Requests';
+import Rooms from './pages/Rooms';
+import TaarufRoom from './pages/TaarufRoom';
+import MyProfile from './pages/MyProfile';
+import Pricing from './pages/Pricing';
 
 // Admin
-import AdminLogin      from './admin/AdminLogin';
-import AdminDashboard  from './admin/AdminDashboard';
-import AdminUsers      from './admin/AdminUsers';
-import AdminRooms      from './admin/AdminRooms';
-import AdminRequests   from './admin/AdminRequests';
-import AdminReports    from './admin/AdminReports';
+import AdminLogin from './admin/AdminLogin';
+import AdminDashboard from './admin/AdminDashboard';
+import AdminUsers from './admin/AdminUsers';
+import AdminRooms from './admin/AdminRooms';
+import AdminRequests from './admin/AdminRequests';
+import AdminReports from './admin/AdminReports';
+import AdminPayments from './admin/AdminPayments';
+import AdminMatch from './admin/AdminMatch';
+
+// Components
+import WhatsAppButton from './components/WhatsAppButton';
 
 // ── Guards ────────────────────────────────────────────────────────────────────
 
@@ -89,10 +94,13 @@ function GuestGuard({ children }) {
 // ── AppShell ──────────────────────────────────────────────────────────────────
 function AppShell({ children }) {
   const location = useLocation();
+  const { authUser } = useApp();
   const isAdmin = location.pathname.startsWith('/admin');
+  const showWhatsApp = !!authUser && !isAdmin;
   return (
     <div className={isAdmin ? 'app-shell app-shell--admin' : 'app-shell'}>
       {children}
+      {showWhatsApp && <WhatsAppButton />}
     </div>
   );
 }
@@ -105,38 +113,40 @@ export default function App() {
         <AppShell>
           <Routes>
             {/* Public — splash & onboarding */}
-            <Route path="/"            element={<SplashScreen />} />
-            <Route path="/onboarding"  element={<Onboarding />} />
+            <Route path="/" element={<SplashScreen />} />
+            <Route path="/onboarding" element={<Onboarding />} />
 
             {/* Guest-only: redirect to app if already logged in */}
-            <Route path="/register"       element={<GuestGuard><Register /></GuestGuard>} />
-            <Route path="/login"          element={<GuestGuard><Login /></GuestGuard>} />
+            <Route path="/register" element={<GuestGuard><Register /></GuestGuard>} />
+            <Route path="/login" element={<GuestGuard><Login /></GuestGuard>} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
 
             {/* Protected — vetting phase (auth required, no onboard check) */}
-            <Route path="/verify"    element={<AuthGuard><VerifyIdentity /></AuthGuard>} />
-            <Route path="/akad"      element={<AuthGuard><Akad /></AuthGuard>} />
+            <Route path="/verify" element={<AuthGuard><VerifyIdentity /></AuthGuard>} />
+            <Route path="/akad" element={<AuthGuard><Akad /></AuthGuard>} />
             <Route path="/readiness" element={<AuthGuard><ReadinessTest /></AuthGuard>} />
 
             {/* Protected — setup */}
             <Route path="/cv-builder" element={<AuthGuard><CVBuilder /></AuthGuard>} />
 
             {/* Protected — main app (require full onboarding) */}
-            <Route path="/discover"       element={<AuthGuard requireOnboarded><Discover /></AuthGuard>} />
-            <Route path="/profile/:id"    element={<AuthGuard requireOnboarded><ProfileView /></AuthGuard>} />
-            <Route path="/requests"       element={<AuthGuard requireOnboarded><Requests /></AuthGuard>} />
-            <Route path="/rooms"          element={<AuthGuard requireOnboarded><Rooms /></AuthGuard>} />
-            <Route path="/room/:roomId"   element={<AuthGuard requireOnboarded><TaarufRoom /></AuthGuard>} />
-            <Route path="/my-profile"     element={<AuthGuard><MyProfile /></AuthGuard>} />
-            <Route path="/pricing"        element={<AuthGuard><Pricing /></AuthGuard>} />
+            <Route path="/discover" element={<AuthGuard requireOnboarded><Discover /></AuthGuard>} />
+            <Route path="/profile/:id" element={<AuthGuard requireOnboarded><ProfileView /></AuthGuard>} />
+            <Route path="/requests" element={<AuthGuard requireOnboarded><Requests /></AuthGuard>} />
+            <Route path="/rooms" element={<AuthGuard requireOnboarded><Rooms /></AuthGuard>} />
+            <Route path="/room/:roomId" element={<AuthGuard requireOnboarded><TaarufRoom /></AuthGuard>} />
+            <Route path="/my-profile" element={<AuthGuard><MyProfile /></AuthGuard>} />
+            <Route path="/pricing" element={<AuthGuard><Pricing /></AuthGuard>} />
 
             {/* Admin panel */}
-            <Route path="/admin"               element={<AdminLogin />} />
-            <Route path="/admin/dashboard"     element={<AdminGuard><AdminDashboard /></AdminGuard>} />
-            <Route path="/admin/users"         element={<AdminGuard><AdminUsers /></AdminGuard>} />
-            <Route path="/admin/rooms"         element={<AdminGuard><AdminRooms /></AdminGuard>} />
-            <Route path="/admin/requests"      element={<AdminGuard><AdminRequests /></AdminGuard>} />
-            <Route path="/admin/reports"       element={<AdminGuard><AdminReports /></AdminGuard>} />
+            <Route path="/admin" element={<AdminLogin />} />
+            <Route path="/admin/dashboard" element={<AdminGuard><AdminDashboard /></AdminGuard>} />
+            <Route path="/admin/users" element={<AdminGuard><AdminUsers /></AdminGuard>} />
+            <Route path="/admin/rooms" element={<AdminGuard><AdminRooms /></AdminGuard>} />
+            <Route path="/admin/requests" element={<AdminGuard><AdminRequests /></AdminGuard>} />
+            <Route path="/admin/reports" element={<AdminGuard><AdminReports /></AdminGuard>} />
+            <Route path="/admin/payments" element={<AdminGuard><AdminPayments /></AdminGuard>} />
+            <Route path="/admin/match" element={<AdminGuard><AdminMatch /></AdminGuard>} />
 
             {/* Fallback */}
             <Route path="*" element={<Navigate to="/" />} />

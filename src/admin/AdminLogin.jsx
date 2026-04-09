@@ -75,6 +75,7 @@ export default function AdminLogin() {
     }}>
       {/* ── Left Panel: Dark Brand ─────────────────────────────── */}
       <motion.div
+        className="admin-login-left"
         initial={{ opacity: 0, x: -40 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.6 }}
@@ -155,6 +156,7 @@ export default function AdminLogin() {
 
       {/* ── Right Panel: Login Form ────────────────────────────── */}
       <motion.div
+        className="admin-login-right"
         initial={{ opacity: 0, x: 40 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.6, delay: 0.1 }}

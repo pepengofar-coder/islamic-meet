@@ -135,17 +135,14 @@ export function AppProvider({ children }) {
   const acceptRequest = useCallback(async (reqId) => {
     if (!authUser) return;
     try {
-      const req = requests.find(r => r.id === reqId);
-      await updateRequestStatus(reqId, 'accepted');
-      setRequests(prev => prev.map(r => r.id === reqId ? { ...r, status: 'accepted' } : r));
-      if (req) {
-        const room = await createRoom(reqId, req.from_id, req.to_id);
-        setRooms(prev => [room, ...prev]);
-      }
+      // User accepts → status becomes 'approved_by_user'
+      // Admin must then approve to create the actual room
+      await updateRequestStatus(reqId, 'approved_by_user');
+      setRequests(prev => prev.map(r => r.id === reqId ? { ...r, status: 'approved_by_user' } : r));
     } catch (err) {
       console.error('acceptRequest error:', err);
     }
-  }, [authUser, requests]);
+  }, [authUser]);
 
   const rejectRequest = useCallback(async (reqId) => {
     try {
