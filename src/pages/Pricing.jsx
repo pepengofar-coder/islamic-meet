@@ -8,6 +8,7 @@ import {
 import { useApp } from '../context/AppContext';
 import { TIERS, getTier, formatPrice } from '../lib/membership';
 import BottomNav from '../components/BottomNav';
+import { supabase } from '../lib/supabase';
 
 
 const FAQ = [
@@ -438,7 +439,7 @@ function UpgradeModal({ tier, billing, onClose }) {
     if (!authUser?.id) return;
     setSending(true);
     try {
-      const { supabase } = await import('../lib/supabase');
+      // supabase already imported at top
       await supabase.from('upgrade_requests').insert({
         user_id: authUser.id,
         user_name: user?.name || user?.full_name || 'Unknown',
