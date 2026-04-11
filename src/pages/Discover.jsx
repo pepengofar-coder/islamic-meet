@@ -8,6 +8,7 @@ import {
 import { useApp } from '../context/AppContext';
 import { ProfileAvatar, MatchBadge } from '../components/Avatar';
 import BottomNav from '../components/BottomNav';
+import IslamicQuotes from '../components/IslamicQuotes';
 
 const filterDefaults = {
   ageMin: 20, ageMax: 35,
@@ -66,7 +67,7 @@ export default function Discover() {
       </div>
 
       {/* Grid */}
-      <div className="discover-grid" style={{ padding: '16px 16px 100px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+      <div className="discover-grid" style={{ padding: '16px 16px 16px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
         {filtered.map((profile, i) => (
           <motion.div
             key={profile.id}
@@ -77,6 +78,46 @@ export default function Discover() {
             <ProfileCard profile={profile} onPress={() => navigate(`/profile/${profile.id}`)} />
           </motion.div>
         ))}
+      </div>
+
+      {/* Quick Access Features */}
+      <div style={{ padding: '8px 16px 0' }}>
+        <p style={{ fontSize: 12, fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 10, fontFamily: "'Nunito', sans-serif" }}>
+          ✨ Fitur Lainnya
+        </p>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+          {[
+            { path: '/wedding-prep', emoji: '📋', label: 'Persiapan\nNikah', gradient: 'linear-gradient(135deg, #5EC994, #3DB878)' },
+            { path: '/nikah-tips', emoji: '📖', label: 'Tips\nNikah', gradient: 'linear-gradient(135deg, #63A8D8, #4A8EBF)' },
+            { path: '/feedback', emoji: '⭐', label: 'Feedback\n& Saran', gradient: 'linear-gradient(135deg, #F5A623, #E08B00)' },
+            { path: '/live-chat', emoji: '💬', label: 'Chat\nAdmin', gradient: 'linear-gradient(135deg, #9B89CC, #7B6BAE)' },
+          ].map((item, i) => (
+            <motion.button
+              key={item.path}
+              whileTap={{ scale: 0.95 }}
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 + i * 0.07 }}
+              onClick={() => navigate(item.path)}
+              style={{
+                background: item.gradient, border: 'none', borderRadius: 18,
+                padding: '18px 14px', cursor: 'pointer', display: 'flex',
+                alignItems: 'center', gap: 10, textAlign: 'left',
+                boxShadow: '0 4px 16px rgba(0,0,0,0.1)',
+              }}
+            >
+              <span style={{ fontSize: 26 }}>{item.emoji}</span>
+              <span style={{ color: 'white', fontSize: 12, fontWeight: 700, lineHeight: 1.3, fontFamily: "'Nunito', sans-serif", whiteSpace: 'pre-line' }}>
+                {item.label}
+              </span>
+            </motion.button>
+          ))}
+        </div>
+      </div>
+
+      {/* Islamic Quotes */}
+      <div style={{ padding: '14px 16px 24px' }}>
+        <IslamicQuotes />
       </div>
 
       {/* Filter Sheet */}

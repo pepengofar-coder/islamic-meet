@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
 import { AppProvider, useApp } from './context/AppContext';
+import ErrorBoundary from './components/ErrorBoundary';
 
 import SplashScreen from './pages/SplashScreen';
 import Onboarding from './pages/Onboarding';
@@ -18,6 +19,10 @@ import Rooms from './pages/Rooms';
 import TaarufRoom from './pages/TaarufRoom';
 import MyProfile from './pages/MyProfile';
 import Pricing from './pages/Pricing';
+import LiveChat from './pages/LiveChat';
+import WeddingPrep from './pages/WeddingPrep';
+import NikahTips from './pages/NikahTips';
+import Feedback from './pages/Feedback';
 
 // Admin
 import AdminLogin from './admin/AdminLogin';
@@ -28,6 +33,7 @@ import AdminRequests from './admin/AdminRequests';
 import AdminReports from './admin/AdminReports';
 import AdminPayments from './admin/AdminPayments';
 import AdminMatch from './admin/AdminMatch';
+import AdminUpgradeRequests from './admin/AdminUpgradeRequests';
 
 // Components
 import WhatsAppButton from './components/WhatsAppButton';
@@ -108,45 +114,51 @@ function AppShell({ children }) {
 // ── App ───────────────────────────────────────────────────────────────────────
 export default function App() {
   return (
+    <ErrorBoundary>
     <AppProvider>
       <BrowserRouter>
         <AppShell>
           <Routes>
             {/* Public — splash & onboarding */}
-            <Route path="/" element={<SplashScreen />} />
-            <Route path="/onboarding" element={<Onboarding />} />
+            <Route path="/" element={<ErrorBoundary><SplashScreen /></ErrorBoundary>} />
+            <Route path="/onboarding" element={<ErrorBoundary><Onboarding /></ErrorBoundary>} />
 
             {/* Guest-only: redirect to app if already logged in */}
-            <Route path="/register" element={<GuestGuard><Register /></GuestGuard>} />
-            <Route path="/login" element={<GuestGuard><Login /></GuestGuard>} />
-            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/register" element={<GuestGuard><ErrorBoundary><Register /></ErrorBoundary></GuestGuard>} />
+            <Route path="/login" element={<GuestGuard><ErrorBoundary><Login /></ErrorBoundary></GuestGuard>} />
+            <Route path="/forgot-password" element={<ErrorBoundary><ForgotPassword /></ErrorBoundary>} />
 
             {/* Protected — vetting phase (auth required, no onboard check) */}
-            <Route path="/verify" element={<AuthGuard><VerifyIdentity /></AuthGuard>} />
-            <Route path="/akad" element={<AuthGuard><Akad /></AuthGuard>} />
-            <Route path="/readiness" element={<AuthGuard><ReadinessTest /></AuthGuard>} />
+            <Route path="/verify" element={<AuthGuard><ErrorBoundary><VerifyIdentity /></ErrorBoundary></AuthGuard>} />
+            <Route path="/akad" element={<AuthGuard><ErrorBoundary><Akad /></ErrorBoundary></AuthGuard>} />
+            <Route path="/readiness" element={<AuthGuard><ErrorBoundary><ReadinessTest /></ErrorBoundary></AuthGuard>} />
 
             {/* Protected — setup */}
-            <Route path="/cv-builder" element={<AuthGuard><CVBuilder /></AuthGuard>} />
+            <Route path="/cv-builder" element={<AuthGuard><ErrorBoundary><CVBuilder /></ErrorBoundary></AuthGuard>} />
 
             {/* Protected — main app (require full onboarding) */}
-            <Route path="/discover" element={<AuthGuard requireOnboarded><Discover /></AuthGuard>} />
-            <Route path="/profile/:id" element={<AuthGuard requireOnboarded><ProfileView /></AuthGuard>} />
-            <Route path="/requests" element={<AuthGuard requireOnboarded><Requests /></AuthGuard>} />
-            <Route path="/rooms" element={<AuthGuard requireOnboarded><Rooms /></AuthGuard>} />
-            <Route path="/room/:roomId" element={<AuthGuard requireOnboarded><TaarufRoom /></AuthGuard>} />
-            <Route path="/my-profile" element={<AuthGuard><MyProfile /></AuthGuard>} />
-            <Route path="/pricing" element={<AuthGuard><Pricing /></AuthGuard>} />
+            <Route path="/discover" element={<AuthGuard requireOnboarded><ErrorBoundary><Discover /></ErrorBoundary></AuthGuard>} />
+            <Route path="/profile/:id" element={<AuthGuard requireOnboarded><ErrorBoundary><ProfileView /></ErrorBoundary></AuthGuard>} />
+            <Route path="/requests" element={<AuthGuard requireOnboarded><ErrorBoundary><Requests /></ErrorBoundary></AuthGuard>} />
+            <Route path="/rooms" element={<AuthGuard requireOnboarded><ErrorBoundary><Rooms /></ErrorBoundary></AuthGuard>} />
+            <Route path="/room/:roomId" element={<AuthGuard requireOnboarded><ErrorBoundary><TaarufRoom /></ErrorBoundary></AuthGuard>} />
+            <Route path="/my-profile" element={<AuthGuard><ErrorBoundary><MyProfile /></ErrorBoundary></AuthGuard>} />
+            <Route path="/pricing" element={<AuthGuard><ErrorBoundary><Pricing /></ErrorBoundary></AuthGuard>} />
+            <Route path="/live-chat" element={<AuthGuard requireOnboarded><ErrorBoundary><LiveChat /></ErrorBoundary></AuthGuard>} />
+            <Route path="/wedding-prep" element={<AuthGuard requireOnboarded><ErrorBoundary><WeddingPrep /></ErrorBoundary></AuthGuard>} />
+            <Route path="/nikah-tips" element={<AuthGuard requireOnboarded><ErrorBoundary><NikahTips /></ErrorBoundary></AuthGuard>} />
+            <Route path="/feedback" element={<AuthGuard requireOnboarded><ErrorBoundary><Feedback /></ErrorBoundary></AuthGuard>} />
 
             {/* Admin panel */}
-            <Route path="/admin" element={<AdminLogin />} />
-            <Route path="/admin/dashboard" element={<AdminGuard><AdminDashboard /></AdminGuard>} />
-            <Route path="/admin/users" element={<AdminGuard><AdminUsers /></AdminGuard>} />
-            <Route path="/admin/rooms" element={<AdminGuard><AdminRooms /></AdminGuard>} />
-            <Route path="/admin/requests" element={<AdminGuard><AdminRequests /></AdminGuard>} />
-            <Route path="/admin/reports" element={<AdminGuard><AdminReports /></AdminGuard>} />
-            <Route path="/admin/payments" element={<AdminGuard><AdminPayments /></AdminGuard>} />
-            <Route path="/admin/match" element={<AdminGuard><AdminMatch /></AdminGuard>} />
+            <Route path="/admin" element={<ErrorBoundary><AdminLogin /></ErrorBoundary>} />
+            <Route path="/admin/dashboard" element={<AdminGuard><ErrorBoundary><AdminDashboard /></ErrorBoundary></AdminGuard>} />
+            <Route path="/admin/users" element={<AdminGuard><ErrorBoundary><AdminUsers /></ErrorBoundary></AdminGuard>} />
+            <Route path="/admin/rooms" element={<AdminGuard><ErrorBoundary><AdminRooms /></ErrorBoundary></AdminGuard>} />
+            <Route path="/admin/requests" element={<AdminGuard><ErrorBoundary><AdminRequests /></ErrorBoundary></AdminGuard>} />
+            <Route path="/admin/reports" element={<AdminGuard><ErrorBoundary><AdminReports /></ErrorBoundary></AdminGuard>} />
+            <Route path="/admin/payments" element={<AdminGuard><ErrorBoundary><AdminPayments /></ErrorBoundary></AdminGuard>} />
+            <Route path="/admin/match" element={<AdminGuard><ErrorBoundary><AdminMatch /></ErrorBoundary></AdminGuard>} />
+            <Route path="/admin/upgrade-requests" element={<AdminGuard><ErrorBoundary><AdminUpgradeRequests /></ErrorBoundary></AdminGuard>} />
 
             {/* Fallback */}
             <Route path="*" element={<Navigate to="/" />} />
@@ -154,5 +166,6 @@ export default function App() {
         </AppShell>
       </BrowserRouter>
     </AppProvider>
+    </ErrorBoundary>
   );
 }

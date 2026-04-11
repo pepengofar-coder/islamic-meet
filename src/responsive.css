@@ -17,9 +17,9 @@
     background: #F7F5FF;
   }
 
-  /* All pages get left margin to clear the 220px sidebar */
+  /* All pages get left margin to clear the 230px sidebar */
   .page {
-    margin-left: 220px;
+    margin-left: 230px;
     padding-bottom: 32px;
     min-height: 100dvh;
   }
@@ -35,58 +35,6 @@
     max-width: 100% !important;
     box-shadow: none !important;
   }
-}
-
-/* ── Desktop Sidebar Nav ──────────────────────────────────────── */
-@media (min-width: 768px) {
-  .bottom-nav {
-    position: fixed;
-    left: 0; top: 0;
-    width: 220px;
-    height: 100dvh;
-    max-width: 220px;
-    flex-direction: column;
-    align-items: stretch;
-    justify-content: flex-start;
-    padding: 0;
-    border-top: none;
-    border-right: 1px solid var(--border);
-    background: white;
-    transform: none !important;
-    box-shadow: 4px 0 20px rgba(45,42,74,0.06);
-    gap: 0;
-    z-index: 100;
-    overflow: hidden;
-  }
-
-  /* Show the brand header & footer (hidden on mobile via style="display:none") */
-  .nav-brand-desktop { display: flex !important; }
-  .nav-footer-desktop { display: block !important; }
-
-  .nav-item {
-    flex-direction: row;
-    justify-content: flex-start;
-    gap: 12px;
-    padding: 13px 20px;
-    border-radius: 0;
-    border-right: 3px solid transparent;
-    width: 100%;
-    transition: all var(--transition-fast);
-  }
-  .nav-item:hover {
-    background: var(--purple-50);
-    border-right-color: var(--purple-200);
-  }
-  .nav-item.active {
-    background: linear-gradient(90deg, var(--purple-50), var(--blue-50));
-    border-right-color: var(--purple-400);
-  }
-  .nav-item.active .nav-icon { color: var(--purple-500); }
-  .nav-item.active .nav-label { color: var(--purple-500); }
-
-  .nav-label { font-size: 14px; font-weight: 700; }
-  .nav-badge { position: static; margin-left: auto; flex-shrink: 0; }
-  .nav-icon { flex-shrink: 0; }
 }
 
 /* ── Discover – 3-col at 768px, 4-col at 1200px ────────────── */

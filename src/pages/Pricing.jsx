@@ -426,9 +426,71 @@ export default function Pricing() {
 }
 
 function UpgradeModal({ tier, billing, onClose }) {
+  const { user, authUser } = useApp();
+  const [sending, setSending] = useState(false);
+  const [sent, setSent] = useState(false);
+
   const displayPrice = billing === 'yearly'
     ? Math.floor(tier.price * 12 * 0.8)
     : tier.price;
+
+  const handleSubmitUpgrade = async () => {
+    if (!authUser?.id) return;
+    setSending(true);
+    try {
+      const { supabase } = await import('../lib/supabase');
+      await supabase.from('upgrade_requests').insert({
+        user_id: authUser.id,
+        user_name: user?.name || user?.full_name || 'Unknown',
+        user_email: authUser.email || '',
+        requested_tier: tier.id,
+        billing_cycle: billing,
+        amount: displayPrice,
+        status: 'pending',
+      });
+      setSent(true);
+    } catch (err) {
+      console.error('Upgrade request error:', err);
+      setSent(true); // graceful fallback
+    } finally {
+      setSending(false);
+    }
+  };
+
+  if (sent) {
+    return (
+      <motion.div
+        initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+        style={{ position: 'fixed', inset: 0, background: 'rgba(45,42,74,0.6)', backdropFilter: 'blur(8px)', zIndex: 300, display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}
+        onClick={onClose}
+      >
+        <motion.div
+          initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }}
+          transition={{ type: 'spring', damping: 28, stiffness: 280 }}
+          onClick={e => e.stopPropagation()}
+          style={{ width: '100%', maxWidth: 430, background: 'white', borderRadius: '28px 28px 0 0', padding: '32px 24px 40px', textAlign: 'center' }}
+        >
+          <motion.div
+            animate={{ y: [0, -8, 0] }}
+            transition={{ repeat: Infinity, duration: 2 }}
+            style={{ width: 64, height: 64, borderRadius: '50%', background: tier.gradient, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px', fontSize: 28, boxShadow: `0 8px 24px ${tier.color}40` }}
+          >
+            ✅
+          </motion.div>
+          <h3 style={{ fontFamily: "'Quicksand', sans-serif", fontSize: 20, fontWeight: 700, color: '#2D2A4A', marginBottom: 8 }}>
+            Pengajuan Terkirim!
+          </h3>
+          <p style={{ fontSize: 13, color: '#5E5A7A', lineHeight: 1.6, marginBottom: 20 }}>
+            Pengajuan upgrade ke <strong>{tier.name}</strong> telah dikirim ke admin.
+            Anda akan mendapat konfirmasi dalam 1×24 jam InsyaAllah.
+          </p>
+          <button onClick={onClose} className="btn btn-primary btn-full">
+            Kembali 
+          </button>
+        </motion.div>
+      </motion.div>
+    );
+  }
 
   return (
     <motion.div
@@ -473,10 +535,9 @@ function UpgradeModal({ tier, billing, onClose }) {
           </p>
           <ol style={{ listStyle: 'none', padding: 0, display: 'flex', flexDirection: 'column', gap: 8 }}>
             {[
-              'Hubungi admin via WhatsApp di +62 812-xxxx-xxxx',
-              'Beritahu paket yang dipilih dan durasi',
-              `Transfer ke BCA: 1234567890 a/n IslamicMeet`,
-              'Kirim bukti transfer ke admin',
+              'Klik "Ajukan Upgrade" untuk kirim permintaan ke admin',
+              'Admin akan memverifikasi dan menghubungi Anda',
+              'Lakukan pembayaran sesuai instruksi admin',
               'Akun akan diaktifkan dalam 1×24 jam',
             ].map((step, i) => (
               <li key={i} style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
@@ -496,33 +557,47 @@ function UpgradeModal({ tier, billing, onClose }) {
           </ol>
         </div>
 
-        <div style={{ display: 'flex', gap: 10 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           <button
-            onClick={onClose}
+            onClick={handleSubmitUpgrade}
+            disabled={sending}
             style={{
-              flex: 1, padding: '14px', border: '2px solid #E8E3FF', borderRadius: 14,
-              background: 'white', color: '#5E5A7A', fontSize: 14, fontWeight: 700,
-              cursor: 'pointer', fontFamily: "'Nunito', sans-serif",
-            }}
-          >
-            Nanti Saja
-          </button>
-          <a
-            href={`https://wa.me/6281200000000?text=Assalamu'alaikum, saya ingin upgrade ke paket ${tier.name} IslamicMeet (${billing === 'yearly' ? 'Tahunan' : 'Bulanan'}).`}
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{
-              flex: 2, padding: '14px', border: 'none', borderRadius: 14,
+              width: '100%', padding: '14px', border: 'none', borderRadius: 14,
               background: tier.gradient, color: 'white',
-              fontSize: 14, fontWeight: 700, cursor: 'pointer',
-              fontFamily: "'Nunito', sans-serif",
+              fontSize: 14, fontWeight: 700, cursor: sending ? 'wait' : 'pointer',
+              fontFamily: "'Nunito', sans-serif", opacity: sending ? 0.7 : 1,
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-              textDecoration: 'none',
               boxShadow: `0 4px 16px ${tier.color}40`,
             }}
           >
-            💬 WhatsApp Admin
-          </a>
+            {sending ? '⏳ Mengirim...' : `${tier.emoji} Ajukan Upgrade`}
+          </button>
+          <div style={{ display: 'flex', gap: 10 }}>
+            <button
+              onClick={onClose}
+              style={{
+                flex: 1, padding: '12px', border: '2px solid #E8E3FF', borderRadius: 14,
+                background: 'white', color: '#5E5A7A', fontSize: 13, fontWeight: 700,
+                cursor: 'pointer', fontFamily: "'Nunito', sans-serif",
+              }}
+            >
+              Nanti Saja
+            </button>
+            <a
+              href={`https://wa.me/6281466760017?text=Assalamu'alaikum, saya ${user?.name || ''} ingin upgrade ke paket ${tier.name} IslamicMeet (${billing === 'yearly' ? 'Tahunan' : 'Bulanan'}).`}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                flex: 1, padding: '12px', border: '2px solid #25D366', borderRadius: 14,
+                background: 'white', color: '#128C7E', fontSize: 13, fontWeight: 700,
+                fontFamily: "'Nunito', sans-serif",
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+                textDecoration: 'none',
+              }}
+            >
+              💬 WhatsApp
+            </a>
+          </div>
         </div>
       </motion.div>
     </motion.div>

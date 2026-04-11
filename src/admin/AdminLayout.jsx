@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard, Users, MessageSquare, Send,
   Moon, LogOut, Menu, X, ChevronRight, Settings,
-  FileText, CreditCard, Heart,
+  FileText, CreditCard, Heart, Crown,
 } from 'lucide-react';
 import { adminGetBadgeCounts } from '../lib/adminDB';
 import '../admin/admin.css';
@@ -30,6 +30,7 @@ export default function AdminLayout({ children, title }) {
     { path: '/admin/match', icon: Heart, label: 'Pasangkan Ta\'aruf' },
     { section: 'LAINNYA' },
     { path: '/admin/payments', icon: CreditCard, label: 'Pembayaran' },
+    { path: '/admin/upgrade-requests', icon: Crown, label: 'Permintaan Upgrade' },
     { path: '/admin/reports', icon: FileText, label: 'Laporan' },
   ];
 
