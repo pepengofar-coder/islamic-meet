@@ -3,40 +3,47 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard, Users, MessageSquare, Send,
   Moon, LogOut, Menu, X, ChevronRight, Settings,
-  FileText, CreditCard, Heart, Crown,
+  FileText, CreditCard, Heart, Crown, Headphones,
 } from 'lucide-react';
 import { adminGetBadgeCounts } from '../lib/adminDB';
+import { getAdminUnreadCount } from '../lib/chatDB';
 import '../admin/admin.css';
 
 export default function AdminLayout({ children, title }) {
   const navigate = useNavigate();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [badges, setBadges] = useState({ unverifiedUsers: 0, pendingRequests: 0 });
+  const [badges, setBadges] = useState({ unverifiedUsers: 0, pendingRequests: 0, unreadChats: 0 });
 
   // Load dynamic badge counts
   useEffect(() => {
-    adminGetBadgeCounts()
-      .then(setBadges)
+    Promise.all([
+      adminGetBadgeCounts(),
+      getAdminUnreadCount(),
+    ])
+      .then(([badgeData, unreadChats]) => {
+        setBadges({ ...badgeData, unreadChats });
+      })
       .catch(console.error);
   }, [location.pathname]); // Refresh when navigating
 
   const navItems = [
     { section: 'UTAMA' },
-    { path: '/admin/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-    { path: '/admin/users', icon: Users, label: 'Pendaftar', badge: badges.unverifiedUsers },
-    { path: '/admin/rooms', icon: MessageSquare, label: 'Ruang Ta\'aruf' },
-    { path: '/admin/requests', icon: Send, label: 'Permintaan', badge: badges.pendingRequests },
-    { path: '/admin/match', icon: Heart, label: 'Pasangkan Ta\'aruf' },
+    { path: '/admin280292/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
+    { path: '/admin280292/users', icon: Users, label: 'Pendaftar', badge: badges.unverifiedUsers },
+    { path: '/admin280292/rooms', icon: MessageSquare, label: 'Ruang Ta\'aruf' },
+    { path: '/admin280292/requests', icon: Send, label: 'Permintaan', badge: badges.pendingRequests },
+    { path: '/admin280292/match', icon: Heart, label: 'Pasangkan Ta\'aruf' },
+    { path: '/admin280292/chat', icon: Headphones, label: 'Live Chat', badge: badges.unreadChats },
     { section: 'LAINNYA' },
-    { path: '/admin/payments', icon: CreditCard, label: 'Pembayaran' },
-    { path: '/admin/upgrade-requests', icon: Crown, label: 'Permintaan Upgrade' },
-    { path: '/admin/reports', icon: FileText, label: 'Laporan' },
+    { path: '/admin280292/payments', icon: CreditCard, label: 'Pembayaran' },
+    { path: '/admin280292/upgrade-requests', icon: Crown, label: 'Permintaan Upgrade' },
+    { path: '/admin280292/reports', icon: FileText, label: 'Laporan' },
   ];
 
   const handleLogout = () => {
     sessionStorage.removeItem('admin_auth');
-    navigate('/admin');
+    navigate('/admin280292');
   };
 
   return (
@@ -90,10 +97,10 @@ export default function AdminLayout({ children, title }) {
         <div className="admin-sidebar-footer">
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', borderRadius: 12, background: 'rgba(255,255,255,0.06)', marginBottom: 8 }}>
             <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'linear-gradient(135deg, #9B89CC, #63A8D8)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <span style={{ fontSize: 13, fontWeight: 800, color: 'white' }}>A</span>
+              <span style={{ fontSize: 13, fontWeight: 800, color: 'white' }}>B</span>
             </div>
             <div>
-              <p style={{ fontSize: 13, fontWeight: 700, color: 'white', lineHeight: 1.2 }}>Admin</p>
+              <p style={{ fontSize: 13, fontWeight: 700, color: 'white', lineHeight: 1.2 }}>Bismillah</p>
               <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.45)' }}>admin@islamicmeet.id</p>
             </div>
           </div>

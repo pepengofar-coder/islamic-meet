@@ -34,6 +34,7 @@ import AdminReports from './admin/AdminReports';
 import AdminPayments from './admin/AdminPayments';
 import AdminMatch from './admin/AdminMatch';
 import AdminUpgradeRequests from './admin/AdminUpgradeRequests';
+import AdminChat from './admin/AdminChat';
 
 // Components
 import WhatsAppButton from './components/WhatsAppButton';
@@ -44,7 +45,7 @@ import WhatsAppButton from './components/WhatsAppButton';
  * AdminGuard: cek sessionStorage admin_auth
  */
 function AdminGuard({ children }) {
-  return sessionStorage.getItem('admin_auth') ? children : <Navigate to="/admin" replace />;
+  return sessionStorage.getItem('admin_auth') ? children : <Navigate to="/admin280292" replace />;
 }
 
 /**
@@ -101,7 +102,7 @@ function GuestGuard({ children }) {
 function AppShell({ children }) {
   const location = useLocation();
   const { authUser } = useApp();
-  const isAdmin = location.pathname.startsWith('/admin');
+  const isAdmin = location.pathname.startsWith('/admin280292');
   const showWhatsApp = !!authUser && !isAdmin;
   return (
     <div className={isAdmin ? 'app-shell app-shell--admin' : 'app-shell'}>
@@ -149,16 +150,17 @@ export default function App() {
             <Route path="/nikah-tips" element={<AuthGuard requireOnboarded><ErrorBoundary><NikahTips /></ErrorBoundary></AuthGuard>} />
             <Route path="/feedback" element={<AuthGuard requireOnboarded><ErrorBoundary><Feedback /></ErrorBoundary></AuthGuard>} />
 
-            {/* Admin panel */}
-            <Route path="/admin" element={<ErrorBoundary><AdminLogin /></ErrorBoundary>} />
-            <Route path="/admin/dashboard" element={<AdminGuard><ErrorBoundary><AdminDashboard /></ErrorBoundary></AdminGuard>} />
-            <Route path="/admin/users" element={<AdminGuard><ErrorBoundary><AdminUsers /></ErrorBoundary></AdminGuard>} />
-            <Route path="/admin/rooms" element={<AdminGuard><ErrorBoundary><AdminRooms /></ErrorBoundary></AdminGuard>} />
-            <Route path="/admin/requests" element={<AdminGuard><ErrorBoundary><AdminRequests /></ErrorBoundary></AdminGuard>} />
-            <Route path="/admin/reports" element={<AdminGuard><ErrorBoundary><AdminReports /></ErrorBoundary></AdminGuard>} />
-            <Route path="/admin/payments" element={<AdminGuard><ErrorBoundary><AdminPayments /></ErrorBoundary></AdminGuard>} />
-            <Route path="/admin/match" element={<AdminGuard><ErrorBoundary><AdminMatch /></ErrorBoundary></AdminGuard>} />
-            <Route path="/admin/upgrade-requests" element={<AdminGuard><ErrorBoundary><AdminUpgradeRequests /></ErrorBoundary></AdminGuard>} />
+            {/* Admin panel — custom route /admin280292 */}
+            <Route path="/admin280292" element={<ErrorBoundary><AdminLogin /></ErrorBoundary>} />
+            <Route path="/admin280292/dashboard" element={<AdminGuard><ErrorBoundary><AdminDashboard /></ErrorBoundary></AdminGuard>} />
+            <Route path="/admin280292/users" element={<AdminGuard><ErrorBoundary><AdminUsers /></ErrorBoundary></AdminGuard>} />
+            <Route path="/admin280292/rooms" element={<AdminGuard><ErrorBoundary><AdminRooms /></ErrorBoundary></AdminGuard>} />
+            <Route path="/admin280292/requests" element={<AdminGuard><ErrorBoundary><AdminRequests /></ErrorBoundary></AdminGuard>} />
+            <Route path="/admin280292/reports" element={<AdminGuard><ErrorBoundary><AdminReports /></ErrorBoundary></AdminGuard>} />
+            <Route path="/admin280292/payments" element={<AdminGuard><ErrorBoundary><AdminPayments /></ErrorBoundary></AdminGuard>} />
+            <Route path="/admin280292/match" element={<AdminGuard><ErrorBoundary><AdminMatch /></ErrorBoundary></AdminGuard>} />
+            <Route path="/admin280292/upgrade-requests" element={<AdminGuard><ErrorBoundary><AdminUpgradeRequests /></ErrorBoundary></AdminGuard>} />
+            <Route path="/admin280292/chat" element={<AdminGuard><ErrorBoundary><AdminChat /></ErrorBoundary></AdminGuard>} />
 
             {/* Fallback */}
             <Route path="*" element={<Navigate to="/" />} />

@@ -7,8 +7,8 @@ import {
 } from 'lucide-react';
 
 // Admin credentials from environment variables
-const ADMIN_USERNAME = import.meta.env.VITE_ADMIN_USERNAME || 'islamicmeet_admin';
-const ADMIN_PASS     = import.meta.env.VITE_ADMIN_SECRET   || 'IslamicMeet@2026!';
+const ADMIN_USERNAME = import.meta.env.VITE_ADMIN_USERNAME || 'bismillah';
+const ADMIN_PASS     = import.meta.env.VITE_ADMIN_SECRET   || 'abuziyadh1992';
 
 const STATS = [
   { icon: Users,     value: '1,284', label: 'Total Pendaftar' },
@@ -62,7 +62,7 @@ export default function AdminLogin() {
     sessionStorage.setItem('admin_auth', '1');
     sessionStorage.setItem('admin_login_time', Date.now().toString());
     sessionStorage.setItem('admin_username', username.trim());
-    navigate('/admin/dashboard');
+    navigate('/admin280292/dashboard');
   };
 
   const isLocked = attempts >= 5;
@@ -189,8 +189,8 @@ export default function AdminLogin() {
             <div>
               <p style={{ fontSize: 12, fontWeight: 800, color: '#2D2A4A', marginBottom: 4 }}>Kredensial Admin</p>
               <p style={{ fontSize: 12, color: '#8B87A8', lineHeight: 1.6 }}>
-                Username: <strong style={{ color: '#5E5A7A' }}>islamicmeet_admin</strong><br />
-                Password: <strong style={{ color: '#5E5A7A' }}>IslamicMeet@2026!</strong>
+                Username: <strong style={{ color: '#5E5A7A' }}>bismillah</strong><br />
+                Password: <strong style={{ color: '#5E5A7A' }}>abuziyadh1992</strong>
               </p>
             </div>
           </motion.div>

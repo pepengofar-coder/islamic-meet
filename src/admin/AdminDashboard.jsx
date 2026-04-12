@@ -206,7 +206,7 @@ export default function AdminDashboard() {
       <motion.div className="admin-card" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>
         <div className="admin-card-header">
           <div className="admin-card-title"><UserCheck size={16} color="#9B89CC" /> Pendaftar Terbaru</div>
-          <button className="admin-btn admin-btn-ghost admin-btn-sm" onClick={() => navigate('/admin/users')} style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+          <button className="admin-btn admin-btn-ghost admin-btn-sm" onClick={() => navigate('/admin280292/users')} style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
             Lihat Semua <ArrowRight size={13} />
           </button>
         </div>
@@ -222,7 +222,7 @@ export default function AdminDashboard() {
                 const colorIdx = Math.abs((u.id || '').charCodeAt(0)) % avatarGradients.length;
                 const status = u.verified && u.cv_done ? 'active' : u.verified ? 'pending' : 'unverified';
                 return (
-                  <motion.tr key={u.id} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.45 + i * 0.05 }} style={{ cursor: 'pointer' }} onClick={() => navigate('/admin/users')}>
+                  <motion.tr key={u.id} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.45 + i * 0.05 }} style={{ cursor: 'pointer' }} onClick={() => navigate('/admin280292/users')}>
                     <td>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                         <div className="admin-avatar" style={{ background: avatarGradients[colorIdx] }}>{initials(u.name)}</div>
