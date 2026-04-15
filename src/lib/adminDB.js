@@ -93,6 +93,65 @@ export async function adminGetProfiles({ search = '', status = 'all', gender = '
   return result;
 }
 
+/**
+ * Admin deletes a user profile (soft-delete: suspends and marks as inactive)
+ */
+export async function adminDeleteUser(userId) {
+  const { error } = await supabase
+    .from('profiles')
+    .update({ suspended: true, is_active: false })
+    .eq('id', userId);
+  if (error) throw error;
+}
+
+/**
+ * Admin manually adds a new user
+ * Creates auth account via signUp, then updates the profile with admin-provided data.
+ * A temporary random password is generated.
+ */
+export async function adminAddUser({ name, email, gender, city, job, education }) {
+  // Check if email already exists in profiles
+  const { data: existing } = await supabase
+    .from('profiles')
+    .select('id')
+    .eq('email', email)
+    .maybeSingle();
+  if (existing) throw new Error('Email sudah terdaftar');
+
+  // Generate a temporary password
+  const tempPassword = 'Temp' + Math.random().toString(36).slice(2, 10) + '!1';
+
+  // Create auth user (this triggers the profile insert from handle_new_user)
+  const { data: authData, error: authError } = await supabase.auth.signUp({
+    email,
+    password: tempPassword,
+    options: { data: { name: name || '', gender: gender || 'akhwat' } },
+  });
+  if (authError) throw new Error(authError.message);
+  if (!authData?.user?.id) throw new Error('Gagal membuat akun');
+
+  // Small delay to let the trigger fire
+  await new Promise(r => setTimeout(r, 500));
+
+  // Update the profile with admin-provided details
+  const { data: profile, error: updateError } = await supabase
+    .from('profiles')
+    .update({
+      name: name || '',
+      email: email || '',
+      gender: gender || 'akhwat',
+      city: city || '',
+      job: job || '',
+      education: education || '',
+    })
+    .eq('id', authData.user.id)
+    .select()
+    .single();
+  if (updateError) throw updateError;
+
+  return profile;
+}
+
 export async function adminVerifyUser(userId) {
   const { error } = await supabase
     .from('profiles')

@@ -2,12 +2,12 @@ import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Search, Users, Eye, CheckCircle, XCircle,
-  X, User, BookOpen, Heart,
+  X, User, BookOpen, Heart, Trash2, Plus,
   MapPin, Briefcase, GraduationCap, Droplets, Star,
   Mail, Calendar, RefreshCw, Shield, Crown,
 } from 'lucide-react';
 import AdminLayout from './AdminLayout';
-import { adminGetProfiles, adminVerifyUser, adminSuspendUser, adminSetMembership, adminUpdateUserStatus, resolveStatus } from '../lib/adminDB';
+import { adminGetProfiles, adminVerifyUser, adminSuspendUser, adminSetMembership, adminUpdateUserStatus, resolveStatus, adminDeleteUser, adminAddUser } from '../lib/adminDB';
 import { getTier } from '../lib/membership';
 import '../admin/admin.css';
 
@@ -34,6 +34,9 @@ export default function AdminUsers() {
   const [selectedUser, setSelectedUser] = useState(null);
   const [sortBy, setSortBy]             = useState('joinDate');
   const [actionLoading, setActionLoading] = useState(false);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [newUser, setNewUser] = useState({ name: '', email: '', gender: 'akhwat', city: '', job: '', education: '' });
+  const [addLoading, setAddLoading] = useState(false);
 
   const loadUsers = useCallback(async () => {
     setLoading(true);
@@ -124,13 +127,44 @@ export default function AdminUsers() {
     setActionLoading(false);
   };
 
+  const handleDeleteUser = async (userId) => {
+    if (!confirm('Yakin ingin menghapus user ini? User akan ditandai sebagai suspended.')) return;
+    setActionLoading(true);
+    try {
+      await adminDeleteUser(userId);
+      setAllUsers(prev => prev.filter(u => u.id !== userId));
+      if (selectedUser?.id === userId) setSelectedUser(null);
+    } catch { alert('Gagal menghapus user.'); }
+    setActionLoading(false);
+  };
+
+  const handleAddUser = async () => {
+    if (!newUser.name?.trim() || !newUser.email?.trim()) {
+      alert('Nama dan email harus diisi');
+      return;
+    }
+    setAddLoading(true);
+    try {
+      const created = await adminAddUser(newUser);
+      setAllUsers(prev => [created, ...prev]);
+      setShowAddModal(false);
+      setNewUser({ name: '', email: '', gender: 'akhwat', city: '', job: '', education: '' });
+    } catch (err) {
+      alert(err.message || 'Gagal menambah user.');
+    }
+    setAddLoading(false);
+  };
+
 
   return (
     <AdminLayout title="Manajemen Pendaftar">
       <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
 
-      {/* Refresh */}
-      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 16 }}>
+      {/* Header actions */}
+      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 16, gap: 8 }}>
+        <button className="admin-btn admin-btn-primary admin-btn-sm" onClick={() => setShowAddModal(true)} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <Plus size={13} /> Tambah User
+        </button>
         <button className="admin-btn admin-btn-ghost admin-btn-sm" onClick={loadUsers} disabled={loading} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
           <RefreshCw size={13} style={{ animation: loading ? 'spin 1s linear infinite' : 'none' }} /> Refresh
         </button>
@@ -339,6 +373,13 @@ export default function AdminUsers() {
                               <Shield size={12} /> Verif
                             </button>
                           )}
+                          <button
+                            onClick={() => handleDeleteUser(u.id)}
+                            disabled={actionLoading}
+                            style={{ fontSize: 11, padding: '5px 10px', background: '#FFF0F0', color: '#8B0000', border: '1px solid #E07070', borderRadius: 8, cursor: 'pointer', fontFamily: "'Nunito', sans-serif", fontWeight: 700, display: 'flex', alignItems: 'center', gap: 4 }}
+                          >
+                            <Trash2 size={12} /> Hapus
+                          </button>
                         </div>
                       </td>
                     </motion.tr>
@@ -359,8 +400,72 @@ export default function AdminUsers() {
             onVerify={handleVerify}
             onSuspend={handleSuspend}
             onSetMembership={handleSetMembership}
+            onDelete={handleDeleteUser}
             actionLoading={actionLoading}
           />
+        )}
+      </AnimatePresence>
+
+      {/* Add User Modal */}
+      <AnimatePresence>
+        {showAddModal && (
+          <motion.div
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            style={{ position: 'fixed', inset: 0, background: 'rgba(45,42,74,0.5)', backdropFilter: 'blur(6px)', zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}
+            onClick={() => setShowAddModal(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }}
+              onClick={e => e.stopPropagation()}
+              style={{ background: 'white', borderRadius: 24, padding: 28, maxWidth: 440, width: '100%', maxHeight: '90vh', overflowY: 'auto' }}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+                <h3 style={{ fontSize: 18, fontWeight: 800, color: '#2D2A4A', fontFamily: "'Quicksand', sans-serif" }}>➕ Tambah User Baru</h3>
+                <button onClick={() => setShowAddModal(false)} style={{ background: '#F0EEF8', border: 'none', borderRadius: 10, width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+                  <X size={16} color="#5E5A7A" />
+                </button>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                {[
+                  { key: 'name', label: 'Nama Lengkap', placeholder: 'Masukkan nama', required: true },
+                  { key: 'email', label: 'Email', placeholder: 'email@contoh.com', type: 'email', required: true },
+                  { key: 'city', label: 'Kota', placeholder: 'Contoh: Bogor' },
+                  { key: 'job', label: 'Pekerjaan', placeholder: 'Contoh: Guru' },
+                  { key: 'education', label: 'Pendidikan', placeholder: 'Contoh: S1' },
+                ].map(field => (
+                  <div key={field.key}>
+                    <label style={{ fontSize: 12, fontWeight: 700, color: '#5E5A7A', marginBottom: 4, display: 'block' }}>
+                      {field.label} {field.required && <span style={{ color: '#E07070' }}>*</span>}
+                    </label>
+                    <input
+                      type={field.type || 'text'}
+                      value={newUser[field.key]}
+                      onChange={e => setNewUser(prev => ({ ...prev, [field.key]: e.target.value }))}
+                      placeholder={field.placeholder}
+                      style={{ width: '100%', padding: '10px 14px', borderRadius: 12, border: '2px solid #E8E3FF', fontSize: 13, fontFamily: "'Nunito', sans-serif", outline: 'none', boxSizing: 'border-box' }}
+                    />
+                  </div>
+                ))}
+                <div>
+                  <label style={{ fontSize: 12, fontWeight: 700, color: '#5E5A7A', marginBottom: 4, display: 'block' }}>Gender</label>
+                  <select
+                    value={newUser.gender}
+                    onChange={e => setNewUser(prev => ({ ...prev, gender: e.target.value }))}
+                    style={{ width: '100%', padding: '10px 14px', borderRadius: 12, border: '2px solid #E8E3FF', fontSize: 13, fontFamily: "'Nunito', sans-serif", outline: 'none', boxSizing: 'border-box', cursor: 'pointer' }}
+                  >
+                    <option value="akhwat">🧕 Akhwat</option>
+                    <option value="ikhwan">🧔 Ikhwan</option>
+                  </select>
+                </div>
+              </div>
+              <div style={{ display: 'flex', gap: 10, marginTop: 20 }}>
+                <button onClick={() => setShowAddModal(false)} style={{ flex: 1, padding: '12px', borderRadius: 12, border: '2px solid #E8E3FF', background: 'white', color: '#5E5A7A', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: "'Nunito', sans-serif" }}>Batal</button>
+                <button onClick={handleAddUser} disabled={addLoading} style={{ flex: 2, padding: '12px', borderRadius: 12, border: 'none', background: 'var(--gradient-primary)', color: 'white', fontSize: 13, fontWeight: 700, cursor: addLoading ? 'wait' : 'pointer', fontFamily: "'Nunito', sans-serif", opacity: addLoading ? 0.7 : 1 }}>
+                  {addLoading ? '⏳ Menyimpan...' : '✅ Tambahkan'}
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
         )}
       </AnimatePresence>
     </AdminLayout>
@@ -369,7 +474,7 @@ export default function AdminUsers() {
 
 // ── Detail Modal ──────────────────────────────────────────────────────────────
 
-function UserDetailModal({ user, onClose, onVerify, onSuspend, onSetMembership, actionLoading }) {
+function UserDetailModal({ user, onClose, onVerify, onSuspend, onSetMembership, onDelete, actionLoading }) {
   const status = resolveStatus(user);
   const colorIdx = Math.abs((user.id || '').charCodeAt(0)) % avatarGradients.length;
 
@@ -523,6 +628,14 @@ function UserDetailModal({ user, onClose, onVerify, onSuspend, onSetMembership, 
               style={{ flex: 1, justifyContent: 'center' }}
             >
               <XCircle size={15} /> {user.suspended ? 'Aktifkan Kembali' : 'Suspend User'}
+            </button>
+            <button
+              className="admin-btn admin-btn-danger"
+              onClick={() => onDelete(user.id)}
+              disabled={actionLoading}
+              style={{ justifyContent: 'center', background: '#FFF0F0', color: '#8B0000', border: '1.5px solid #E07070' }}
+            >
+              <Trash2 size={15} /> Hapus
             </button>
           </div>
         </div>

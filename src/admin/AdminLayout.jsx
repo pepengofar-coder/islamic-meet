@@ -7,22 +7,24 @@ import {
 } from 'lucide-react';
 import { adminGetBadgeCounts } from '../lib/adminDB';
 import { getAdminUnreadCount } from '../lib/chatDB';
+import { supabase } from '../lib/supabase';
 import '../admin/admin.css';
 
 export default function AdminLayout({ children, title }) {
   const navigate = useNavigate();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [badges, setBadges] = useState({ unverifiedUsers: 0, pendingRequests: 0, unreadChats: 0 });
+  const [badges, setBadges] = useState({ unverifiedUsers: 0, pendingRequests: 0, unreadChats: 0, pendingUpgrades: 0 });
 
   // Load dynamic badge counts
   useEffect(() => {
     Promise.all([
       adminGetBadgeCounts(),
       getAdminUnreadCount(),
+      supabase.from('upgrade_requests').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
     ])
-      .then(([badgeData, unreadChats]) => {
-        setBadges({ ...badgeData, unreadChats });
+      .then(([badgeData, unreadChats, upgradeRes]) => {
+        setBadges({ ...badgeData, unreadChats, pendingUpgrades: upgradeRes.count || 0 });
       })
       .catch(console.error);
   }, [location.pathname]); // Refresh when navigating
@@ -37,7 +39,7 @@ export default function AdminLayout({ children, title }) {
     { path: '/admin280292/chat', icon: Headphones, label: 'Live Chat', badge: badges.unreadChats },
     { section: 'LAINNYA' },
     { path: '/admin280292/payments', icon: CreditCard, label: 'Pembayaran' },
-    { path: '/admin280292/upgrade-requests', icon: Crown, label: 'Permintaan Upgrade' },
+    { path: '/admin280292/upgrade-requests', icon: Crown, label: 'Permintaan Upgrade', badge: badges.pendingUpgrades },
     { path: '/admin280292/reports', icon: FileText, label: 'Laporan' },
   ];
 

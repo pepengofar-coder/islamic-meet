@@ -3,10 +3,11 @@ import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import {
   Users, CheckCircle, MessageSquare, Heart, TrendingUp,
-  UserCheck, Clock, AlertCircle, ArrowRight, Star, RefreshCw,
+  UserCheck, Clock, AlertCircle, ArrowRight, Star, RefreshCw, Crown,
 } from 'lucide-react';
 import AdminLayout from './AdminLayout';
 import { adminGetStats } from '../lib/adminDB';
+import { supabase } from '../lib/supabase';
 import '../admin/admin.css';
 
 const avatarGradients = [
@@ -32,7 +33,11 @@ export default function AdminDashboard() {
     setLoading(true);
     setError(null);
     try {
-      const data = await adminGetStats();
+      const [data, upgradeRes] = await Promise.all([
+        adminGetStats(),
+        supabase.from('upgrade_requests').select('id, status').eq('status', 'pending'),
+      ]);
+      data.pendingUpgrades = upgradeRes.data?.length || 0;
       setStats(data);
     } catch (err) {
       console.error('Failed to load stats:', err);
@@ -77,6 +82,7 @@ export default function AdminDashboard() {
     total = 0, active = 0, pending = 0, unverified = 0,
     ikhwan = 0, akhwat = 0,
     activeRooms = 0, closedRooms = 0, pendingRequests = 0,
+    pendingUpgrades = 0,
     registrationActivity = [], recentUsers = [],
   } = stats || {};
 
@@ -88,6 +94,7 @@ export default function AdminDashboard() {
     { label: 'Menunggu Verifikasi',   value: pending + unverified, icon: Clock,   color: '#F5A623', bg: '#FFF3E0', change: `${unverified} belum verifikasi`, trend: '!' },
     { label: "Ruang Ta'aruf Aktif",   value: activeRooms,     icon: MessageSquare,color: '#63A8D8', bg: '#DBEAFE', change: `${closedRooms} sudah selesai`, trend: '+' },
     { label: 'Permintaan Pending',    value: pendingRequests,  icon: Heart,       color: '#E07070', bg: '#FFEFEF', change: 'Perlu tindak lanjut', trend: '!' },
+    { label: 'Upgrade Pending',       value: pendingUpgrades,  icon: Crown,       color: '#F5A623', bg: '#FFF3E0', change: pendingUpgrades > 0 ? 'Butuh persetujuan' : 'Tidak ada', trend: pendingUpgrades > 0 ? '!' : '+', link: '/admin280292/upgrade-requests' },
     { label: 'Ruang Selesai',         value: closedRooms,     icon: Star,         color: '#7E6BAF', bg: '#F0EBFF', change: 'MasyaAllah 🎉', trend: '+' },
   ];
 
@@ -105,7 +112,7 @@ export default function AdminDashboard() {
         {statCards.map((s, i) => {
           const Icon = s.icon;
           return (
-            <motion.div key={i} className="admin-stat-card" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.07 }}>
+            <motion.div key={i} className="admin-stat-card" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.07 }} onClick={() => s.link && navigate(s.link)} style={{ cursor: s.link ? 'pointer' : 'default' }}>
               <div className="admin-stat-icon" style={{ background: s.bg }}>
                 <Icon size={22} color={s.color} />
               </div>

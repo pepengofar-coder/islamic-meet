@@ -46,7 +46,7 @@ export default function Pricing() {
   };
 
   return (
-    <div className="page page--no-nav" style={{ background: 'var(--bg)', minHeight: '100dvh', paddingBottom: 80 }}>
+    <div className="page" style={{ background: 'var(--bg)', minHeight: '100dvh', paddingBottom: 80 }}>
       {/* Header */}
       <div style={{
         background: 'linear-gradient(135deg, #2D2A4A 0%, #4A3D7A 50%, #2D4A7A 100%)',
