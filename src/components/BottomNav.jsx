@@ -108,13 +108,11 @@ export default function BottomNav() {
             />
             <motion.div
               className="mobile-nav-drawer"
-              initial={{ y: '100%', opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              exit={{ y: '100%', opacity: 0 }}
+              initial={{ x: '-50%', y: '-40%', opacity: 0, scale: 0.95 }}
+              animate={{ x: '-50%', y: '-50%', opacity: 1, scale: 1 }}
+              exit={{ x: '-50%', y: '-40%', opacity: 0, scale: 0.95 }}
               transition={{ type: 'spring', damping: 28, stiffness: 340 }}
             >
-              <div style={{ width: 40, height: 4, borderRadius: 2, background: 'var(--border)', margin: '0 auto 12px' }} />
-
               {/* Brand */}
               <div className="mobile-nav-brand">
                 <div className="nav-brand-logo">
@@ -128,7 +126,7 @@ export default function BottomNav() {
               </div>
 
               {/* Scrollable content */}
-              <div style={{ maxHeight: 'calc(70dvh - 120px)', overflowY: 'auto', overflowX: 'hidden' }}>
+              <div style={{ flex: 1, maxHeight: 'calc(85dvh - 160px)', overflowY: 'auto', overflowX: 'hidden', paddingRight: '4px', margin: '0 -4px 0 0' }}>
                 {/* Main nav */}
                 <p style={{ fontSize: 10, fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: 1, padding: '8px 14px 4px' }}>Menu Utama</p>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
