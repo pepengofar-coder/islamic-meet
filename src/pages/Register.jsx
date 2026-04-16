@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Mail, Lock, User, Eye, EyeOff, ArrowLeft, Moon } from 'lucide-react';
 import { signUp } from '../lib/auth';
+import { sendWelcomeEmail } from '../lib/emailjs';
 
 export default function Register() {
   const navigate = useNavigate();
@@ -19,6 +20,9 @@ export default function Register() {
     setError('');
     try {
       await signUp({ email: form.email, password: form.password, name: form.name, gender: form.gender });
+      // Send Welcome Email
+      await sendWelcomeEmail(form.email, form.name);
+      
       // Show confirmation modal before redirecting
       setShowConfirm(true);
     } catch (err) {

@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Crown, CheckCircle, XCircle, Clock, RefreshCw } from 'lucide-react';
-import AdminLayout from './AdminLayout';
 import { supabase } from '../lib/supabase';
+import { sendUpgradeEmail } from '../lib/emailjs';
 
 export default function AdminUpgradeRequests() {
   const [requests, setRequests] = useState([]);
@@ -30,16 +30,21 @@ export default function AdminUpgradeRequests() {
 
   useEffect(() => { load(); }, [filter]);
 
-  const updateStatus = async (id, status, userId, tier) => {
+  const updateStatus = async (id, status, reqData) => {
     try {
       await supabase.from('upgrade_requests').update({ status, updated_at: new Date().toISOString() }).eq('id', id);
-      if (status === 'approved' && userId && tier) {
+      if (status === 'approved' && reqData?.userId && reqData?.tier) {
         const expiresAt = new Date();
         expiresAt.setMonth(expiresAt.getMonth() + 1);
         await supabase.from('profiles').update({
-          membership_tier: tier,
+          membership_tier: reqData.tier,
           membership_expires_at: expiresAt.toISOString(),
-        }).eq('id', userId);
+        }).eq('id', reqData.userId);
+
+        // Send Upgrade Email
+        if (reqData.userEmail && reqData.userName) {
+          await sendUpgradeEmail(reqData.userEmail, reqData.userName, reqData.tier);
+        }
       }
       load();
     } catch (err) {
