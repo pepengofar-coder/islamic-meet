@@ -155,7 +155,7 @@ export async function adminAddUser({ name, email, gender, city, job, education }
 export async function adminVerifyUser(userId) {
   const { error } = await supabase
     .from('profiles')
-    .update({ verified: true })
+    .update({ verified: true, cv_done: true })
     .eq('id', userId);
   if (error) throw error;
 }

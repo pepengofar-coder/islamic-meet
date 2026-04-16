@@ -81,8 +81,8 @@ export default function AdminUsers() {
     setActionLoading(true);
     try {
       await adminVerifyUser(userId);
-      setAllUsers(prev => prev.map(u => u.id === userId ? { ...u, verified: true } : u));
-      if (selectedUser?.id === userId) setSelectedUser(prev => ({ ...prev, verified: true }));
+      setAllUsers(prev => prev.map(u => u.id === userId ? { ...u, verified: true, cv_done: true } : u));
+      if (selectedUser?.id === userId) setSelectedUser(prev => ({ ...prev, verified: true, cv_done: true }));
     } catch { alert('Gagal memverifikasi user.'); }
     setActionLoading(false);
   };
