@@ -57,9 +57,9 @@ export default function TaarufRoom() {
     );
   }
 
-  const startDate = new Date(room.started_at).getTime();
+  const startDate = new Date(room.created_at).getTime();
   const durationDays = room.duration_days || 7;
-  const endDate = startDate + durationDays * 86400000;
+  const endDate = room.expires_at ? new Date(room.expires_at).getTime() : (startDate + durationDays * 86400000);
   const now = Date.now();
   const remainMs = Math.max(0, endDate - now);
   const remainDays = Math.floor(remainMs / 86400000);

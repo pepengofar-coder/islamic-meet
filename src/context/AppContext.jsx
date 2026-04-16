@@ -85,10 +85,48 @@ export function AppProvider({ children }) {
   }, [authUser, user.cvDone, user.gender]);
 
   // ── Load requests & rooms ────────────────────────────────────────────
+  const refreshRooms = useCallback(async () => {
+    if (!authUser) return;
+    try {
+      const roomsData = await getRooms(authUser.id);
+      setRooms(roomsData);
+    } catch (err) {
+      console.error('Error refreshing rooms:', err);
+    }
+  }, [authUser]);
+
   useEffect(() => {
     if (!authUser) return;
     getRequests(authUser.id).then(setRequests).catch(console.error);
     getRooms(authUser.id).then(setRooms).catch(console.error);
+
+    // Realtime: listen for new rooms involving this user
+    const channel = supabase
+      .channel('user-rooms')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'taaruf_rooms' },
+        (payload) => {
+          const row = payload.new;
+          if (row && (row.user1_id === authUser.id || row.user2_id === authUser.id)) {
+            // Reload rooms to get full joined data
+            getRooms(authUser.id).then(setRooms).catch(console.error);
+          }
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'taaruf_requests' },
+        (payload) => {
+          const row = payload.new;
+          if (row && (row.from_id === authUser.id || row.to_id === authUser.id)) {
+            getRequests(authUser.id).then(setRequests).catch(console.error);
+          }
+        }
+      )
+      .subscribe();
+
+    return () => supabase.removeChannel(channel);
   }, [authUser]);
 
   // ── User Actions ─────────────────────────────────────────────────────
@@ -187,7 +225,7 @@ export function AppProvider({ children }) {
       // Requests
       requests, sendRequest, acceptRequest, rejectRequest,
       // Rooms
-      rooms,
+      rooms, refreshRooms,
       // Chat (legacy stubs)
       sendMessage, simulateReply,
       // Navigation
