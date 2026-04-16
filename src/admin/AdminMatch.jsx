@@ -5,7 +5,7 @@ import {
   AlertCircle, X, ArrowRight,
 } from 'lucide-react';
 import AdminLayout from './AdminLayout';
-import { adminGetProfiles, adminCreateTaarufPair } from '../lib/adminDB';
+import { adminGetProfiles, adminCreateTaarufPair, adminGetRooms } from '../lib/adminDB';
 import '../admin/admin.css';
 
 const avatarGradients = [
@@ -23,6 +23,7 @@ function initials(name) {
 
 export default function AdminMatch() {
   const [users, setUsers] = useState([]);
+  const [activeUserIds, setActiveUserIds] = useState(new Set());
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [actionLoading, setActionLoading] = useState(false);
@@ -37,8 +38,18 @@ export default function AdminMatch() {
     setLoading(true);
     setError(null);
     try {
-      const data = await adminGetProfiles();
-      setUsers(data);
+      const profilesData = await adminGetProfiles();
+      const roomsData = await adminGetRooms();
+      
+      const activeRooms = roomsData.filter(r => r.status === 'active');
+      const ids = new Set();
+      activeRooms.forEach(r => {
+        if (r.user1_id) ids.add(r.user1_id);
+        if (r.user2_id) ids.add(r.user2_id);
+      });
+      
+      setActiveUserIds(ids);
+      setUsers(profilesData);
     } catch (err) {
       console.error(err);
       setError('Gagal memuat data user.');
@@ -49,8 +60,8 @@ export default function AdminMatch() {
 
   useEffect(() => { loadUsers(); }, []);
 
-  const ikhwanList = users.filter(u => u.gender === 'ikhwan' && u.verified && u.cv_done);
-  const akhwatList = users.filter(u => u.gender === 'akhwat' && u.verified && u.cv_done);
+  const ikhwanList = users.filter(u => u.gender === 'ikhwan' && u.verified && u.cv_done && !activeUserIds.has(u.id));
+  const akhwatList = users.filter(u => u.gender === 'akhwat' && u.verified && u.cv_done && !activeUserIds.has(u.id));
 
   const filteredIkhwan = ikhwanList.filter(u =>
     !search1 || (u.name || '').toLowerCase().includes(search1.toLowerCase()) || (u.city || '').toLowerCase().includes(search1.toLowerCase())
