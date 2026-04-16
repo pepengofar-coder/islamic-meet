@@ -60,8 +60,8 @@ export default function AdminMatch() {
 
   useEffect(() => { loadUsers(); }, []);
 
-  const ikhwanList = users.filter(u => u.gender === 'ikhwan' && u.verified && u.cv_done && !activeUserIds.has(u.id));
-  const akhwatList = users.filter(u => u.gender === 'akhwat' && u.verified && u.cv_done && !activeUserIds.has(u.id));
+  const ikhwanList = users.filter(u => u.gender === 'ikhwan' && u.verified && u.cv_done && !u.suspended && !activeUserIds.has(u.id));
+  const akhwatList = users.filter(u => u.gender === 'akhwat' && u.verified && u.cv_done && !u.suspended && !activeUserIds.has(u.id));
 
   const filteredIkhwan = ikhwanList.filter(u =>
     !search1 || (u.name || '').toLowerCase().includes(search1.toLowerCase()) || (u.city || '').toLowerCase().includes(search1.toLowerCase())
