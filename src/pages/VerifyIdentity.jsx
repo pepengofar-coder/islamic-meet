@@ -476,6 +476,24 @@ export default function VerifyIdentity() {
         >
           {loading ? "Memproses..." : "Kirim & Lanjut"}
         </button>
+
+        <button
+          type="button"
+          onClick={() => navigate('/akad')}
+          style={{
+            width: "100%",
+            padding: "16px 20px",
+            border: "none",
+            background: "transparent",
+            color: "var(--text-muted)",
+            fontWeight: 600,
+            fontSize: 14,
+            cursor: "pointer",
+            marginTop: 8,
+          }}
+        >
+          Lewati untuk sekarang
+        </button>
       </motion.div>
     </div>
   );
