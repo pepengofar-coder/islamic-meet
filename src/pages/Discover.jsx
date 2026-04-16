@@ -26,10 +26,11 @@ export default function Discover() {
   const [filters, setFilters] = useState(filterDefaults);
 
   const filtered = profiles.filter(p => {
-    if (search && !(p.name || '').toLowerCase().includes(search.toLowerCase()) && !(p.city || '').toLowerCase().includes(search.toLowerCase())) return false;
-    if (filters.city && !(p.city || '').toLowerCase().includes(filters.city.toLowerCase())) return false;
-    if (filters.salat && p.salat !== filters.salat) return false;
-    if (filters.smoking !== null && p.smoking !== filters.smoking) return false;
+    const cv = p.cv || p;
+    if (search && !(p.name || '').toLowerCase().includes(search.toLowerCase()) && !(cv.city || '').toLowerCase().includes(search.toLowerCase())) return false;
+    if (filters.city && !(cv.city || '').toLowerCase().includes(filters.city.toLowerCase())) return false;
+    if (filters.salat && cv.salat !== filters.salat) return false;
+    if (filters.smoking !== null && cv.smoking !== filters.smoking) return false;
     return true;
   }).sort((a, b) => (b.matchScore || 0) - (a.matchScore || 0));
 
@@ -133,6 +134,7 @@ export default function Discover() {
 }
 
 function ProfileCard({ profile, onPress }) {
+  const cv = profile.cv || profile;
   return (
     <motion.button
       whileTap={{ scale: 0.97 }}
@@ -163,15 +165,15 @@ function ProfileCard({ profile, onPress }) {
           {(profile.name || '—').split(' ').slice(0, 2).join(' ')}
         </p>
         <p style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 8 }}>
-          {profile.age || '—'} th • {(profile.city || '—').split(' ')[0]}
+          {cv.age || '—'} th • {(cv.city || '—').split(' ')[0]}
         </p>
 
         {/* Tags */}
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginBottom: 10 }}>
           <span style={{ padding: '3px 8px', borderRadius: 20, background: 'var(--blue-50)', color: 'var(--blue-500)', fontSize: 10, fontWeight: 700 }}>
-            {(profile.education || '—').split(' ')[0]}
+            {(cv.education || '—').split(' ')[0]}
           </span>
-          {!profile.smoking && (
+          {!cv.smoking && (
             <span style={{ padding: '3px 8px', borderRadius: 20, background: '#E6F9F0', color: '#1E7A50', fontSize: 10, fontWeight: 700 }}>
               🚭
             </span>

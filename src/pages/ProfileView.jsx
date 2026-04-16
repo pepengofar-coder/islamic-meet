@@ -20,6 +20,8 @@ export default function ProfileView() {
   const profile = profiles.find(p => p.id === id);
   if (!profile) return null;
 
+  const cv = profile.cv || profile;
+
   const alreadySent = requests.some(r => r.fromId === 'me' && r.toId === id);
 
   const handleSendRequest = (msg) => {
@@ -73,35 +75,35 @@ export default function ProfileView() {
           {profile.name}
         </h1>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-          <span style={{ fontSize: 14, color: 'var(--text-secondary)', fontWeight: 500 }}>{profile.age} tahun</span>
+          <span style={{ fontSize: 14, color: 'var(--text-secondary)', fontWeight: 500 }}>{cv.age} tahun</span>
           <span style={{ color: 'var(--border)' }}>•</span>
           <span style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 14, color: 'var(--text-secondary)', fontWeight: 500 }}>
-            <MapPin size={13} /> {profile.city}
+            <MapPin size={13} /> {cv.city}
           </span>
         </div>
-        {profile.bio && (
+        {cv.bio && (
           <p style={{ marginTop: 10, fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.6, fontStyle: 'italic', padding: '10px 14px', background: 'var(--purple-50)', borderRadius: 12, borderLeft: '3px solid var(--purple-300)' }}>
-            "{profile.bio}"
+            "{cv.bio}"
           </p>
         )}
       </div>
 
       {/* Data Diri */}
       <Section title="Data Diri" icon={Briefcase} color="var(--purple-400)">
-        <InfoRow icon={GraduationCap} label="Pendidikan" value={profile.education} iconColor="var(--purple-400)" />
-        <InfoRow icon={Briefcase} label="Pekerjaan" value={profile.job} iconColor="var(--purple-400)" />
-        <InfoRow icon={DollarSign} label="Penghasilan" value={profile.incomeRange} iconColor="var(--purple-400)" />
+        <InfoRow icon={GraduationCap} label="Pendidikan" value={cv.education} iconColor="var(--purple-400)" />
+        <InfoRow icon={Briefcase} label="Pekerjaan" value={cv.job} iconColor="var(--purple-400)" />
+        <InfoRow icon={DollarSign} label="Penghasilan" value={cv.incomeRange} iconColor="var(--purple-400)" />
       </Section>
 
       {/* Ibadah */}
       <Section title="Data Ibadah" icon={BookOpen} color="var(--blue-500)">
-        <InfoRow icon={BookOpen} label="Frekuensi Shalat" value={profile.salat} iconColor="var(--blue-500)" />
-        <InfoRow icon={BookOpen} label="Tilawah / Hari" value={profile.tilawah} iconColor="var(--blue-500)" />
-        <InfoRow icon={BookOpen} label="Mazhab" value={profile.mazhab} iconColor="var(--blue-500)" />
+        <InfoRow icon={BookOpen} label="Frekuensi Shalat" value={cv.salat} iconColor="var(--blue-500)" />
+        <InfoRow icon={BookOpen} label="Tilawah / Hari" value={cv.tilawah} iconColor="var(--blue-500)" />
+        <InfoRow icon={BookOpen} label="Mazhab" value={cv.mazhab} iconColor="var(--blue-500)" />
         <div style={{ marginTop: 10 }}>
           <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 8 }}>Latar Belakang</p>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-            {profile.islamicBackground.map(bg => (
+            {(cv.islamicBackground || []).map(bg => (
               <span key={bg} style={{ padding: '5px 12px', borderRadius: 20, background: 'var(--blue-50)', color: 'var(--blue-500)', fontSize: 12, fontWeight: 700 }}>{bg}</span>
             ))}
           </div>
@@ -110,21 +112,21 @@ export default function ProfileView() {
 
       {/* Kesehatan */}
       <Section title="Data Kesehatan" icon={Heart} color="var(--success)">
-        <InfoRow icon={Droplets} label="Golongan Darah" value={profile.bloodType} iconColor="var(--danger)" />
-        <InfoRow icon={Wind} label="Merokok" value={profile.smoking ? '🚬 Perokok' : '🚭 Tidak Merokok'} iconColor="var(--success)" />
-        <InfoRow icon={Heart} label="Penyakit Kronis" value={profile.hasChronicIllness ? `Ada (${profile.illnessDetail || 'detail dirahasiakan'})` : '✅ Tidak Ada'} iconColor="var(--success)" />
+        <InfoRow icon={Droplets} label="Golongan Darah" value={cv.bloodType} iconColor="var(--danger)" />
+        <InfoRow icon={Wind} label="Merokok" value={cv.smoking ? '🚬 Perokok' : '🚭 Tidak Merokok'} iconColor="var(--success)" />
+        <InfoRow icon={Heart} label="Penyakit Kronis" value={cv.hasChronicIllness ? `Ada (${cv.illnessDetail || 'detail dirahasiakan'})` : '✅ Tidak Ada'} iconColor="var(--success)" />
       </Section>
 
       {/* Visi & Misi */}
       <Section title="Visi & Misi" icon={Home} color="var(--warning)">
-        <InfoRow icon={Home} label="Tempat Tinggal" value={profile.visionLiving} iconColor="var(--warning)" />
-        <InfoRow icon={Baby} label="Pendidikan Anak" value={profile.visionParenting} iconColor="var(--warning)" />
-        <InfoRow icon={DollarSign} label="Keuangan RT" value={profile.visionFinance} iconColor="var(--warning)" />
-        {profile.hobbies?.length > 0 && (
+        <InfoRow icon={Home} label="Tempat Tinggal" value={cv.visionLiving} iconColor="var(--warning)" />
+        <InfoRow icon={Baby} label="Pendidikan Anak" value={cv.visionParenting} iconColor="var(--warning)" />
+        <InfoRow icon={DollarSign} label="Keuangan RT" value={cv.visionFinance} iconColor="var(--warning)" />
+        {cv.hobbies?.length > 0 && (
           <div style={{ marginTop: 10 }}>
             <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 8 }}>Hobi</p>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-              {profile.hobbies.map(h => (
+              {cv.hobbies.map(h => (
                 <span key={h} style={{ padding: '5px 12px', borderRadius: 20, background: '#FFF3E0', color: '#7A5010', fontSize: 12, fontWeight: 700 }}>{h}</span>
               ))}
             </div>
