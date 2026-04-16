@@ -80,6 +80,7 @@ export default function AdminMatch() {
       setSuccessMsg(`✅ Berhasil! Ruang ta'aruf telah dibuat untuk ${(user1.name || 'User 1').split(' ')[0]} & ${(user2.name || 'User 2').split(' ')[0]}.`);
       setUser1(null);
       setUser2(null);
+      loadUsers(); // Refresh daftar agar yang baru dipasangkan hilang
     } catch (err) {
       console.error(err);
       alert('Gagal membuat pasangan ta\'aruf. Silakan coba lagi.');
