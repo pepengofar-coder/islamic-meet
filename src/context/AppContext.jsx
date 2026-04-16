@@ -199,14 +199,14 @@ export function AppProvider({ children }) {
 
   // ── Navigation Helpers ────────────────────────────────────────────────
   const getNextStep = useCallback(() => {
+    if (user.cvDone)         return '/discover';
     if (!user.verified)      return '/verify';
     if (!user.akadSigned)    return '/akad';
     if (!user.readinessDone) return '/readiness';
-    if (!user.cvDone)        return '/cv-builder';
-    return '/discover';
+    return '/cv-builder';
   }, [user]);
 
-  const isOnboarded = !!(user.verified && user.akadSigned && user.readinessDone && user.cvDone);
+  const isOnboarded = !!user.cvDone;
 
   // ── Computed Values ───────────────────────────────────────────────────
   const pendingRequestsCount = requests.filter(r =>
