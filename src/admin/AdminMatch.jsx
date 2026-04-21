@@ -294,6 +294,22 @@ export default function AdminMatch() {
         )}
       </AnimatePresence>
 
+      {/* Error message */}
+      <AnimatePresence>
+        {errorMsg && (
+          <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+            style={{ background: '#FFF0F0', borderRadius: 12, padding: '12px 16px', marginBottom: 20, display: 'flex', alignItems: 'center', justifyContent: 'space-between', border: '1px solid #FFBDBD' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <AlertCircle size={18} color="#8B0000" />
+              <span style={{ fontSize: 13, fontWeight: 700, color: '#8B0000' }}>{errorMsg}</span>
+            </div>
+            <button onClick={() => setErrorMsg('')} style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
+              <X size={16} color="#8B0000" />
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {tab === 'match' && (
         <>
           {/* Info banner */}
@@ -399,7 +415,7 @@ export default function AdminMatch() {
             style={{ marginTop: 24, display: 'flex', justifyContent: 'center' }}>
             <button
               className="admin-btn admin-btn-primary"
-              onClick={handleMatch}
+              onClick={() => setShowConfirmMatch(true)}
               disabled={!user1 || !user2 || actionLoading}
               style={{
                 padding: '14px 32px', fontSize: 15, borderRadius: 14,
@@ -407,7 +423,15 @@ export default function AdminMatch() {
                 cursor: user1 && user2 ? 'pointer' : 'not-allowed',
               }}
             >
-              <Heart size={18} /> Pasangkan Ta'aruf
+              {actionLoading ? (
+                <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <motion.span animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+                    style={{ display: 'inline-block', width: 16, height: 16, border: '2px solid rgba(255,255,255,0.3)', borderTopColor: 'white', borderRadius: '50%' }} />
+                  Memproses...
+                </span>
+              ) : (
+                <><Heart size={18} /> Pasangkan Ta'aruf</>
+              )}
             </button>
           </motion.div>
         </>
@@ -454,6 +478,48 @@ export default function AdminMatch() {
       <AnimatePresence>
         {detailUser && (
           <UserSpecDrawer user={detailUser} onClose={() => setDetailUser(null)} />
+        )}
+      </AnimatePresence>
+
+      {/* Confirmation Modal */}
+      <AnimatePresence>
+        {showConfirmMatch && user1 && user2 && (
+          <motion.div
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            style={{ position: 'fixed', inset: 0, background: 'rgba(45,42,74,0.6)', backdropFilter: 'blur(6px)', zIndex: 300, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+            onClick={() => setShowConfirmMatch(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.8, opacity: 0 }}
+              onClick={e => e.stopPropagation()}
+              style={{ background: 'white', borderRadius: 20, padding: '28px 32px', maxWidth: 420, width: '90%', textAlign: 'center', boxShadow: '0 20px 60px rgba(0,0,0,0.3)' }}
+            >
+              <div style={{ width: 56, height: 56, borderRadius: '50%', background: 'linear-gradient(135deg, #E07070, #F5A623)', margin: '0 auto 16px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Heart size={28} color="white" />
+              </div>
+              <h3 style={{ fontSize: 17, fontWeight: 800, color: '#2D2A4A', marginBottom: 8, fontFamily: "'Quicksand', sans-serif" }}>Pasangkan Ta'aruf?</h3>
+              <p style={{ fontSize: 13, color: '#5E5A7A', marginBottom: 20, lineHeight: 1.6 }}>
+                Yakin ingin memasangkan <strong>{user1.name}</strong> ({user1.gender === 'ikhwan' ? '♂' : '♀'}) dengan <strong>{user2.name}</strong> ({user2.gender === 'akhwat' ? '♀' : '♂'})?
+                <br /><br />
+                Ruang ta'aruf akan dibuat dan kedua user akan melihatnya di dashboard mereka.
+              </p>
+              <div style={{ display: 'flex', gap: 10, justifyContent: 'center' }}>
+                <button
+                  onClick={() => setShowConfirmMatch(false)}
+                  style={{ padding: '10px 24px', borderRadius: 12, border: '1px solid #E8E3FF', background: 'white', color: '#5E5A7A', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: "'Nunito', sans-serif" }}
+                >
+                  Batal
+                </button>
+                <button
+                  onClick={handleMatch}
+                  className="admin-btn admin-btn-primary"
+                  style={{ padding: '10px 24px', borderRadius: 12, fontSize: 13 }}
+                >
+                  <Heart size={14} /> Ya, Pasangkan!
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
         )}
       </AnimatePresence>
     </AdminLayout>
