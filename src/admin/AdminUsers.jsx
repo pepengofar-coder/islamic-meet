@@ -25,14 +25,14 @@ function initials(name = '?') {
 }
 
 export default function AdminUsers() {
-  const [allUsers, setAllUsers]         = useState([]);
-  const [loading, setLoading]           = useState(true);
-  const [error, setError]               = useState(null);
-  const [search, setSearch]             = useState('');
+  const [allUsers, setAllUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [search, setSearch] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
   const [filterGender, setFilterGender] = useState('all');
   const [selectedUser, setSelectedUser] = useState(null);
-  const [sortBy, setSortBy]             = useState('joinDate');
+  const [sortBy, setSortBy] = useState('joinDate');
   const [actionLoading, setActionLoading] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [newUser, setNewUser] = useState({ name: '', email: '', gender: 'akhwat', city: '', job: '', education: '' });
@@ -59,8 +59,8 @@ export default function AdminUsers() {
     .filter(u => {
       const st = resolveStatus(u);
       if (search && !((u.name || '').toLowerCase().includes(search.toLowerCase()) ||
-          (u.email || '').toLowerCase().includes(search.toLowerCase()) ||
-          (u.city || '').toLowerCase().includes(search.toLowerCase()))) return false;
+        (u.email || '').toLowerCase().includes(search.toLowerCase()) ||
+        (u.city || '').toLowerCase().includes(search.toLowerCase()))) return false;
       if (filterStatus !== 'all' && st !== filterStatus) return false;
       if (filterGender !== 'all' && u.gender !== filterGender) return false;
       return true;
@@ -72,9 +72,9 @@ export default function AdminUsers() {
     });
 
   const statusCounts = {
-    all:        allUsers.length,
-    active:     allUsers.filter(u => resolveStatus(u) === 'active').length,
-    pending:    allUsers.filter(u => resolveStatus(u) === 'pending').length,
+    all: allUsers.length,
+    active: allUsers.filter(u => resolveStatus(u) === 'active').length,
+    pending: allUsers.filter(u => resolveStatus(u) === 'pending').length,
     unverified: allUsers.filter(u => resolveStatus(u) === 'unverified').length,
   };
 
@@ -116,10 +116,10 @@ export default function AdminUsers() {
     try {
       let updates = {};
       switch (newStatus) {
-        case 'active':     updates = { verified: true, cv_done: true, suspended: false }; break;
-        case 'pending':    updates = { verified: true, cv_done: false, suspended: false }; break;
+        case 'active': updates = { verified: true, cv_done: true, suspended: false }; break;
+        case 'pending': updates = { verified: true, cv_done: false, suspended: false }; break;
         case 'unverified': updates = { verified: false, cv_done: false, suspended: false }; break;
-        case 'suspended':  updates = { suspended: true }; break;
+        case 'suspended': updates = { suspended: true }; break;
         default: return;
       }
       await adminUpdateUserStatus(userId, updates);
@@ -191,10 +191,10 @@ export default function AdminUsers() {
       {/* Filter tabs */}
       <div style={{ display: 'flex', gap: 10, marginBottom: 20, flexWrap: 'wrap' }}>
         {[
-          { key: 'all',        label: 'Semua',        color: '#9B89CC' },
-          { key: 'active',     label: '● Aktif',      color: '#5EC994' },
-          { key: 'pending',    label: '◌ Pending',    color: '#F5A623' },
-          { key: 'unverified', label: '○ Belum Verif',color: '#E07070' },
+          { key: 'all', label: 'Semua', color: '#9B89CC' },
+          { key: 'active', label: '● Aktif', color: '#5EC994' },
+          { key: 'pending', label: '◌ Pending', color: '#F5A623' },
+          { key: 'unverified', label: '○ Belum Verif', color: '#E07070' },
         ].map(tab => (
           <button
             key={tab.key}
@@ -296,113 +296,113 @@ export default function AdminUsers() {
                   </td>
                 </tr>
               ) : filtered.map((u, i) => {
-                  const status = resolveStatus(u);
-                  const colorIdx = Math.abs((u.id || '').charCodeAt(0)) % avatarGradients.length;
-                  return (
-                    <motion.tr
-                      key={u.id}
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ delay: i * 0.04 }}
-                      style={{ cursor: 'pointer' }}
-                      onClick={() => setSelectedUser(u)}
-                    >
-                      <td>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                          <div className="admin-avatar" style={{ background: avatarGradients[colorIdx] }}>
-                            {initials(u.name)}
-                          </div>
-                          <div>
-                            <p style={{ fontSize: 13, fontWeight: 700, color: '#2D2A4A', marginBottom: 1 }}>{u.name || '—'}</p>
-                            <p style={{ fontSize: 11, color: '#9896B0' }}>{u.email}</p>
-                          </div>
+                const status = resolveStatus(u);
+                const colorIdx = Math.abs((u.id || '').charCodeAt(0)) % avatarGradients.length;
+                return (
+                  <motion.tr
+                    key={u.id}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: i * 0.04 }}
+                    style={{ cursor: 'pointer' }}
+                    onClick={() => setSelectedUser(u)}
+                  >
+                    <td>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                        <div className="admin-avatar" style={{ background: avatarGradients[colorIdx] }}>
+                          {initials(u.name)}
                         </div>
-                      </td>
-                      <td>
-                        <span className={`admin-badge ${u.gender === 'ikhwan' ? 'badge-ikhwan' : 'badge-akhwat'}`}>
-                          {u.gender === 'ikhwan' ? '🧔 Ikhwan' : '🧕 Akhwat'}
-                        </span>
-                      </td>
-                      <td>
-                        <p style={{ fontSize: 13, fontWeight: 600, color: '#2D2A4A' }}>{u.age ? `${u.age} tahun` : '—'}</p>
-                        <p style={{ fontSize: 11, color: '#9896B0' }}>{u.city || '—'}</p>
-                      </td>
-                      <td>
-                        <p style={{ fontSize: 13, color: '#2D2A4A' }}>{u.job || '—'}</p>
-                        <p style={{ fontSize: 11, color: '#9896B0' }}>{u.education || '—'}</p>
-                      </td>
-                      <td>
-                        {/* Membership tier badge */}
-                        {(() => {
-                          const t = getTier(u.membership_tier || 'regular');
-                          return (
-                            <span style={{
-                              display: 'inline-flex', alignItems: 'center', gap: 4,
-                              padding: '3px 8px', borderRadius: 8,
-                              background: t.colorBg, border: `1px solid ${t.colorBorder}`,
-                              fontSize: 11, fontWeight: 800, color: t.color,
-                              fontFamily: "'Nunito', sans-serif",
-                            }}>
-                              {t.emoji} {t.name}
-                            </span>
-                          );
-                        })()}
-                      </td>
-                      <td onClick={e => e.stopPropagation()}>
-                        <select
-                          value={status}
-                          onChange={e => handleStatusChange(u.id, e.target.value)}
-                          disabled={actionLoading}
-                          style={{
-                            padding: '5px 8px', borderRadius: 8,
-                            border: `1.5px solid ${status === 'active' ? '#5EC994' : status === 'pending' ? '#F5A623' : status === 'suspended' ? '#999' : '#E07070'}`,
-                            background: status === 'active' ? '#E6F9F0' : status === 'pending' ? '#FFF3E0' : status === 'suspended' ? '#F5F5F5' : '#FFF0F0',
-                            color: status === 'active' ? '#1E7A50' : status === 'pending' ? '#8B5E00' : status === 'suspended' ? '#666' : '#8B0000',
-                            fontSize: 11, fontWeight: 800,
+                        <div>
+                          <p style={{ fontSize: 13, fontWeight: 700, color: '#2D2A4A', marginBottom: 1 }}>{u.name || '—'}</p>
+                          <p style={{ fontSize: 11, color: '#9896B0' }}>{u.email}</p>
+                        </div>
+                      </div>
+                    </td>
+                    <td>
+                      <span className={`admin-badge ${u.gender === 'ikhwan' ? 'badge-ikhwan' : 'badge-akhwat'}`}>
+                        {u.gender === 'ikhwan' ? '🧔 Ikhwan' : '🧕 Akhwat'}
+                      </span>
+                    </td>
+                    <td>
+                      <p style={{ fontSize: 13, fontWeight: 600, color: '#2D2A4A' }}>{u.age ? `${u.age} tahun` : '—'}</p>
+                      <p style={{ fontSize: 11, color: '#9896B0' }}>{u.city || '—'}</p>
+                    </td>
+                    <td>
+                      <p style={{ fontSize: 13, color: '#2D2A4A' }}>{u.job || '—'}</p>
+                      <p style={{ fontSize: 11, color: '#9896B0' }}>{u.education || '—'}</p>
+                    </td>
+                    <td>
+                      {/* Membership tier badge */}
+                      {(() => {
+                        const t = getTier(u.membership_tier || 'regular');
+                        return (
+                          <span style={{
+                            display: 'inline-flex', alignItems: 'center', gap: 4,
+                            padding: '3px 8px', borderRadius: 8,
+                            background: t.colorBg, border: `1px solid ${t.colorBorder}`,
+                            fontSize: 11, fontWeight: 800, color: t.color,
                             fontFamily: "'Nunito', sans-serif",
-                            cursor: 'pointer', outline: 'none',
-                            appearance: 'auto',
-                          }}
+                          }}>
+                            {t.emoji} {t.name}
+                          </span>
+                        );
+                      })()}
+                    </td>
+                    <td onClick={e => e.stopPropagation()}>
+                      <select
+                        value={status}
+                        onChange={e => handleStatusChange(u.id, e.target.value)}
+                        disabled={actionLoading}
+                        style={{
+                          padding: '5px 8px', borderRadius: 8,
+                          border: `1.5px solid ${status === 'active' ? '#5EC994' : status === 'pending' ? '#F5A623' : status === 'suspended' ? '#999' : '#E07070'}`,
+                          background: status === 'active' ? '#E6F9F0' : status === 'pending' ? '#FFF3E0' : status === 'suspended' ? '#F5F5F5' : '#FFF0F0',
+                          color: status === 'active' ? '#1E7A50' : status === 'pending' ? '#8B5E00' : status === 'suspended' ? '#666' : '#8B0000',
+                          fontSize: 11, fontWeight: 800,
+                          fontFamily: "'Nunito', sans-serif",
+                          cursor: 'pointer', outline: 'none',
+                          appearance: 'auto',
+                        }}
+                      >
+                        <option value="active">✓ Aktif</option>
+                        <option value="pending">◌ Pending</option>
+                        <option value="unverified">! Belum Verif</option>
+                        <option value="suspended">⛔ Suspended</option>
+                      </select>
+                    </td>
+                    <td style={{ color: '#9896B0', fontSize: 12 }}>
+                      {new Date(u.created_at).toLocaleDateString('id-ID', { year: 'numeric', month: 'short', day: 'numeric' })}
+                    </td>
+                    <td onClick={e => e.stopPropagation()}>
+                      <div style={{ display: 'flex', gap: 6 }}>
+                        <button
+                          className="admin-btn admin-btn-primary admin-btn-sm"
+                          onClick={() => setSelectedUser(u)}
+                          style={{ fontSize: 11, padding: '5px 10px' }}
                         >
-                          <option value="active">✓ Aktif</option>
-                          <option value="pending">◌ Pending</option>
-                          <option value="unverified">! Belum Verif</option>
-                          <option value="suspended">⛔ Suspended</option>
-                        </select>
-                      </td>
-                      <td style={{ color: '#9896B0', fontSize: 12 }}>
-                        {new Date(u.created_at).toLocaleDateString('id-ID', { year: 'numeric', month: 'short', day: 'numeric' })}
-                      </td>
-                      <td onClick={e => e.stopPropagation()}>
-                        <div style={{ display: 'flex', gap: 6 }}>
+                          <Eye size={12} /> Detail
+                        </button>
+                        {!u.verified && (
                           <button
-                            className="admin-btn admin-btn-primary admin-btn-sm"
-                            onClick={() => setSelectedUser(u)}
-                            style={{ fontSize: 11, padding: '5px 10px' }}
-                          >
-                            <Eye size={12} /> Detail
-                          </button>
-                          {!u.verified && (
-                            <button
-                              onClick={() => handleVerify(u.id)}
-                              disabled={actionLoading}
-                              style={{ fontSize: 11, padding: '5px 10px', background: '#E6F9F0', color: '#1E7A50', border: '1px solid #5EC994', borderRadius: 8, cursor: 'pointer', fontFamily: "'Nunito', sans-serif", fontWeight: 700, display: 'flex', alignItems: 'center', gap: 4 }}
-                            >
-                              <Shield size={12} /> Verif
-                            </button>
-                          )}
-                          <button
-                            onClick={() => handleDeleteUser(u.id)}
+                            onClick={() => handleVerify(u.id)}
                             disabled={actionLoading}
-                            style={{ fontSize: 11, padding: '5px 10px', background: '#FFF0F0', color: '#8B0000', border: '1px solid #E07070', borderRadius: 8, cursor: 'pointer', fontFamily: "'Nunito', sans-serif", fontWeight: 700, display: 'flex', alignItems: 'center', gap: 4 }}
+                            style={{ fontSize: 11, padding: '5px 10px', background: '#E6F9F0', color: '#1E7A50', border: '1px solid #5EC994', borderRadius: 8, cursor: 'pointer', fontFamily: "'Nunito', sans-serif", fontWeight: 700, display: 'flex', alignItems: 'center', gap: 4 }}
                           >
-                            <Trash2 size={12} /> Hapus
+                            <Shield size={12} /> Verif
                           </button>
-                        </div>
-                      </td>
-                    </motion.tr>
-                  );
-                })
+                        )}
+                        <button
+                          onClick={() => handleDeleteUser(u.id)}
+                          disabled={actionLoading}
+                          style={{ fontSize: 11, padding: '5px 10px', background: '#FFF0F0', color: '#8B0000', border: '1px solid #E07070', borderRadius: 8, cursor: 'pointer', fontFamily: "'Nunito', sans-serif", fontWeight: 700, display: 'flex', alignItems: 'center', gap: 4 }}
+                        >
+                          <Trash2 size={12} /> Hapus
+                        </button>
+                      </div>
+                    </td>
+                  </motion.tr>
+                );
+              })
               }
             </tbody>
           </table>
@@ -497,10 +497,10 @@ function UserDetailModal({ user, onClose, onVerify, onSuspend, onSetMembership, 
   const colorIdx = Math.abs((user.id || '').charCodeAt(0)) % avatarGradients.length;
 
   const steps = [
-    { label: 'Identitas Terverifikasi', done: !!user.verified,      icon: CheckCircle },
-    { label: 'Akad Ditandatangani',     done: !!user.akad_signed,   icon: CheckCircle },
-    { label: 'Uji Kesiapan Selesai',    done: !!user.readiness_done, icon: Star },
-    { label: 'CV Digital Lengkap',      done: !!user.cv_done,       icon: User },
+    { label: 'Identitas Terverifikasi', done: !!user.verified, icon: CheckCircle },
+    { label: 'Akad Ditandatangani', done: !!user.akad_signed, icon: CheckCircle },
+    { label: 'Uji Kesiapan Selesai', done: !!user.readiness_done, icon: Star },
+    { label: 'CV Digital Lengkap', done: !!user.cv_done, icon: User },
   ];
 
   return (
@@ -544,12 +544,12 @@ function UserDetailModal({ user, onClose, onVerify, onSuspend, onSetMembership, 
           {/* Contact info */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
             {[
-              { icon: Mail,          label: 'Email',          val: user.email || '—' },
-              { icon: Calendar,      label: 'Tanggal Daftar', val: new Date(user.created_at).toLocaleDateString('id-ID') },
-              { icon: MapPin,        label: 'Kota',           val: user.city || '—' },
-              { icon: GraduationCap, label: 'Pendidikan',     val: user.education || '—' },
-              { icon: Briefcase,     label: 'Pekerjaan',      val: user.job || '—' },
-              { icon: User,          label: 'Usia',           val: user.age ? `${user.age} tahun` : '—' },
+              { icon: Mail, label: 'Email', val: user.email || '—' },
+              { icon: Calendar, label: 'Tanggal Daftar', val: new Date(user.created_at).toLocaleDateString('id-ID') },
+              { icon: MapPin, label: 'Kota', val: user.city || '—' },
+              { icon: GraduationCap, label: 'Pendidikan', val: user.education || '—' },
+              { icon: Briefcase, label: 'Pekerjaan', val: user.job || '—' },
+              { icon: User, label: 'Usia', val: user.age ? `${user.age} tahun` : '—' },
             ].map((item, i) => (
               <div key={i} style={{ display: 'flex', gap: 10, alignItems: 'flex-start', padding: '10px 12px', background: '#FAFAF8', borderRadius: 12 }}>
                 <item.icon size={14} color="#9B89CC" style={{ marginTop: 1, flexShrink: 0 }} />
