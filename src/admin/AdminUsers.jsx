@@ -164,6 +164,20 @@ export default function AdminUsers() {
     <AdminLayout title="Manajemen Pendaftar">
       <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
 
+      {/* Verify success toast */}
+      {verifyToast && (
+        <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
+          style={{ background: '#E6F9F0', borderRadius: 12, padding: '12px 16px', marginBottom: 16, display: 'flex', alignItems: 'center', justifyContent: 'space-between', border: '1px solid #A3E6C4' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <CheckCircle size={18} color="#1E7A50" />
+            <span style={{ fontSize: 13, fontWeight: 700, color: '#1E7A50', fontFamily: "'Nunito', sans-serif" }}>{verifyToast}</span>
+          </div>
+          <button onClick={() => setVerifyToast('')} style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
+            <X size={14} color="#1E7A50" />
+          </button>
+        </motion.div>
+      )}
+
       {/* Header actions */}
       <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 16, gap: 8 }}>
         <button className="admin-btn admin-btn-primary admin-btn-sm" onClick={() => setShowAddModal(true)} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
