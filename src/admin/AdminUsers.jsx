@@ -37,6 +37,7 @@ export default function AdminUsers() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [newUser, setNewUser] = useState({ name: '', email: '', gender: 'akhwat', city: '', job: '', education: '' });
   const [addLoading, setAddLoading] = useState(false);
+  const [verifyToast, setVerifyToast] = useState('');
 
   const loadUsers = useCallback(async () => {
     setLoading(true);
@@ -81,8 +82,11 @@ export default function AdminUsers() {
     setActionLoading(true);
     try {
       await adminVerifyUser(userId);
+      const verifiedUser = allUsers.find(u => u.id === userId);
       setAllUsers(prev => prev.map(u => u.id === userId ? { ...u, verified: true, cv_done: true } : u));
       if (selectedUser?.id === userId) setSelectedUser(prev => ({ ...prev, verified: true, cv_done: true }));
+      setVerifyToast(`✅ ${verifiedUser?.name || 'User'} berhasil diverifikasi! User sekarang aktif & muncul di menu "Pasangkan Ta'aruf".`);
+      setTimeout(() => setVerifyToast(''), 6000);
     } catch { alert('Gagal memverifikasi user.'); }
     setActionLoading(false);
   };
