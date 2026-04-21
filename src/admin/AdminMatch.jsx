@@ -141,8 +141,10 @@ export default function AdminMatch() {
   const [search1, setSearch1] = useState('');
   const [search2, setSearch2] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
+  const [errorMsg, setErrorMsg] = useState('');
   const [detailUser, setDetailUser] = useState(null);
   const [tab, setTab] = useState('match'); // 'match' | 'pairs'
+  const [showConfirmMatch, setShowConfirmMatch] = useState(false);
 
   const loadData = async () => {
     setLoading(true);
@@ -187,29 +189,32 @@ export default function AdminMatch() {
 
   const handleMatch = async () => {
     if (!user1 || !user2) return;
-    if (!confirm(`Yakin ingin memasangkan ${user1.name || 'User 1'} dengan ${user2.name || 'User 2'} untuk Ta'aruf?`)) return;
-
+    setShowConfirmMatch(false);
     setActionLoading(true);
+    setErrorMsg('');
     try {
-      await adminCreateTaarufPair(user1.id, user2.id);
+      console.log('[AdminMatch] Creating pair:', user1.id, user2.id);
+      const result = await adminCreateTaarufPair(user1.id, user2.id);
+      console.log('[AdminMatch] Pair created:', result);
       setSuccessMsg(`✅ Berhasil! Ruang ta'aruf telah dibuat untuk ${(user1.name || '').split(' ')[0]} & ${(user2.name || '').split(' ')[0]}. User akan melihat ruang di menu Ta'aruf mereka.`);
       setUser1(null);
       setUser2(null);
       loadData();
     } catch (err) {
-      console.error(err);
-      alert('Gagal membuat pasangan ta\'aruf. Silakan coba lagi.');
+      console.error('[AdminMatch] Error creating pair:', err);
+      setErrorMsg(`Gagal membuat pasangan: ${err?.message || String(err)}`);
     }
     setActionLoading(false);
   };
 
   const handleCloseRoom = async (roomId) => {
-    if (!confirm('Yakin ingin menutup ruang ta\'aruf ini?')) return;
     setActionLoading(true);
     try {
       await adminCloseRoom(roomId);
       setRooms(prev => prev.map(r => r.id === roomId ? { ...r, status: 'closed' } : r));
-    } catch { alert('Gagal menutup ruang.'); }
+    } catch (err) {
+      setErrorMsg(`Gagal menutup ruang: ${err?.message || ''}`);
+    }
     setActionLoading(false);
   };
 

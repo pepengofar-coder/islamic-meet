@@ -2,8 +2,18 @@
  * adminDB.js — Supabase data helpers for the admin panel
  * FULL integration with real Supabase data.
  * Provides CRUD for profiles, rooms, requests, and stats.
+ *
+ * Uses a dedicated admin Supabase client (no auth session)
+ * so that the `anon` RLS policies apply consistently,
+ * even when a regular user is logged in on the same browser.
  */
-import { supabase } from './supabase';
+import { createClient } from '@supabase/supabase-js';
+
+const supabase = createClient(
+  import.meta.env.VITE_SUPABASE_URL,
+  import.meta.env.VITE_SUPABASE_ANON_KEY,
+  { auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false } }
+);
 
 // ── Status resolver ───────────────────────────────────────────────────────────
 
