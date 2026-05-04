@@ -31,7 +31,7 @@ export default function MyProfile() {
 
   const openEdit = (section) => {
     const data = {
-      personal: { fullName: cv.fullName, age: cv.age, city: cv.city, education: cv.education, job: cv.job, incomeRange: cv.incomeRange, bio: cv.bio },
+      personal: { fullName: cv.fullName, birthPlace: cv.birthPlace, birthDate: cv.birthDate, city: cv.city, education: cv.education, job: cv.job, incomeRange: cv.incomeRange, bio: cv.bio },
       ibadah:   { salat: cv.salat, tilawah: cv.tilawah, mazhab: cv.mazhab },
       kesehatan: { bloodType: cv.bloodType, smoking: cv.smoking, exercise: cv.exercise },
       visi:     { visionLiving: cv.visionLiving, visionParenting: cv.visionParenting, visionFinance: cv.visionFinance },
@@ -158,7 +158,8 @@ export default function MyProfile() {
               <CVSection title="Data Personal" icon={User} color="var(--purple-400)" onEdit={() => openEdit('personal')}
                 items={[
                   cv.fullName    && { label: 'Nama Lengkap', val: cv.fullName },
-                  cv.age         && { label: 'Usia', val: cv.age + ' tahun' },
+                  (cv.birthPlace || cv.birthDate) && { label: 'TTL', val: `${cv.birthPlace || '—'}, ${cv.birthDate ? new Date(cv.birthDate).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : '—'}` },
+                  cv.birthDate   && { label: 'Usia', val: (() => { const t = new Date(), b = new Date(cv.birthDate); let a = t.getFullYear() - b.getFullYear(); if (t.getMonth() < b.getMonth() || (t.getMonth() === b.getMonth() && t.getDate() < b.getDate())) a--; return `${a} tahun`; })() },
                   cv.city        && { label: 'Kota', val: cv.city },
                   cv.education   && { label: 'Pendidikan', val: cv.education },
                   cv.job         && { label: 'Pekerjaan', val: cv.job },
@@ -317,7 +318,24 @@ function EditForm({ section, data, onChange }) {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
       {[
         { key: 'fullName', label: 'Nama Lengkap', placeholder: 'Fulanah binti Fulan' },
-        { key: 'age', label: 'Usia', placeholder: '24', type: 'number' },
+        { key: 'birthPlace', label: 'Tempat Lahir', placeholder: 'Jakarta' },
+      ].map(f => (
+        <div key={f.key} className="form-group">
+          <label className="form-label">{f.label}</label>
+          <input className="form-input" type="text" value={data[f.key] || ''} onChange={e => set(f.key, e.target.value)} placeholder={f.placeholder} />
+        </div>
+      ))}
+      <div className="form-group">
+        <label className="form-label">Tanggal Lahir</label>
+        <input className="form-input" type="date" value={data.birthDate || ''} onChange={e => set('birthDate', e.target.value)} style={{ colorScheme: 'light' }} />
+        {data.birthDate && (() => {
+          const today = new Date(), bd = new Date(data.birthDate);
+          let age = today.getFullYear() - bd.getFullYear();
+          if (today.getMonth() < bd.getMonth() || (today.getMonth() === bd.getMonth() && today.getDate() < bd.getDate())) age--;
+          return age > 0 ? <p style={{ fontSize: 12, color: 'var(--purple-400)', fontWeight: 700, marginTop: 6 }}>🎂 Usia: {age} tahun</p> : null;
+        })()}
+      </div>
+      {[
         { key: 'city', label: 'Kota Domisili', placeholder: 'Jakarta Selatan' },
         { key: 'education', label: 'Pendidikan', placeholder: 'S1 Teknik Informatika' },
         { key: 'job', label: 'Pekerjaan', placeholder: 'Software Engineer' },
@@ -325,7 +343,7 @@ function EditForm({ section, data, onChange }) {
       ].map(f => (
         <div key={f.key} className="form-group">
           <label className="form-label">{f.label}</label>
-          <input className="form-input" type={f.type || 'text'} value={data[f.key] || ''} onChange={e => set(f.key, e.target.value)} placeholder={f.placeholder} />
+          <input className="form-input" type="text" value={data[f.key] || ''} onChange={e => set(f.key, e.target.value)} placeholder={f.placeholder} />
         </div>
       ))}
       <div className="form-group">

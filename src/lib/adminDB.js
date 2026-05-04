@@ -119,7 +119,7 @@ export async function adminDeleteUser(userId) {
  * Creates auth account via signUp, then updates the profile with admin-provided data.
  * A temporary random password is generated.
  */
-export async function adminAddUser({ name, email, gender, city, job, education }) {
+export async function adminAddUser({ name, email, gender, city, job, education, birth_place, birth_date }) {
   // Check if email already exists in profiles
   const { data: existing } = await supabase
     .from('profiles')
@@ -153,6 +153,8 @@ export async function adminAddUser({ name, email, gender, city, job, education }
       city: city || '',
       job: job || '',
       education: education || '',
+      birth_place: birth_place || '',
+      birth_date: birth_date || null,
     })
     .eq('id', authData.user.id)
     .select()
@@ -202,8 +204,8 @@ export async function adminGetRequests() {
     .from('taaruf_requests')
     .select(`
       *,
-      from_profile:profiles!taaruf_requests_from_id_fkey(id, name, full_name, gender, city, age, job, education),
-      to_profile:profiles!taaruf_requests_to_id_fkey(id, name, full_name, gender, city, age, job, education)
+      from_profile:profiles!taaruf_requests_from_id_fkey(id, name, full_name, gender, city, birth_place, birth_date, job, education),
+      to_profile:profiles!taaruf_requests_to_id_fkey(id, name, full_name, gender, city, birth_place, birth_date, job, education)
     `)
     .order('created_at', { ascending: false });
 
@@ -319,7 +321,7 @@ export async function adminGetRoomMessageCount(roomId) {
 export async function adminGetStats() {
   // Run all queries in parallel with individual error handling
   const [profilesRes, roomsRes, requestsRes] = await Promise.all([
-    supabase.from('profiles').select('id, name, full_name, email, gender, verified, cv_done, created_at, suspended, city, job, education, age'),
+    supabase.from('profiles').select('id, name, full_name, email, gender, verified, cv_done, created_at, suspended, city, job, education, birth_place, birth_date'),
     supabase.from('taaruf_rooms').select('id, status, created_at, expires_at, user1_id, user2_id'),
     supabase.from('taaruf_requests').select('id, status, created_at'),
   ]);

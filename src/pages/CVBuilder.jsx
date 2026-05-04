@@ -53,7 +53,6 @@ function Step1({ data, onChange, onNext, onBack }) {
       <div style={{ background: 'white', borderRadius: '28px 28px 0 0', marginTop: -24, padding: '28px 24px 32px', display: 'flex', flexDirection: 'column', gap: 18 }}>
         {[
           { label: 'Nama Lengkap', key: 'fullName', ph: 'Nama sesuai KTP', icon: User },
-          { label: 'Usia', key: 'age', ph: 'Contoh: 25', icon: User, type: 'number' },
         ].map(({ label, key, ph, icon: Ic, type }) => (
           <div className="form-group" key={key}>
             <label className="form-label">{label}</label>
@@ -63,6 +62,33 @@ function Step1({ data, onChange, onNext, onBack }) {
             </div>
           </div>
         ))}
+        {/* Tempat Lahir */}
+        <div className="form-group">
+          <label className="form-label">Tempat Lahir</label>
+          <div className="input-icon-wrapper">
+            <MapPin size={18} className="input-icon" />
+            <input className="form-input" type="text" placeholder="Contoh: Jakarta" value={data.birthPlace || ''} onChange={e => onChange({ birthPlace: e.target.value })} />
+          </div>
+        </div>
+        {/* Tanggal Lahir */}
+        <div className="form-group">
+          <label className="form-label">Tanggal Lahir</label>
+          <div className="input-icon-wrapper">
+            <Activity size={18} className="input-icon" />
+            <input className="form-input" type="date" value={data.birthDate || ''} onChange={e => onChange({ birthDate: e.target.value })} style={{ colorScheme: 'light' }} />
+          </div>
+          {data.birthDate && (() => {
+            const today = new Date();
+            const bd = new Date(data.birthDate);
+            let age = today.getFullYear() - bd.getFullYear();
+            if (today.getMonth() < bd.getMonth() || (today.getMonth() === bd.getMonth() && today.getDate() < bd.getDate())) age--;
+            return age > 0 ? (
+              <p style={{ fontSize: 12, color: 'var(--purple-400)', fontWeight: 700, marginTop: 6 }}>
+                🎂 Usia Anda: {age} tahun
+              </p>
+            ) : null;
+          })()}
+        </div>
         <div className="form-group">
           <label className="form-label">Domisili</label>
           <div className="input-icon-wrapper">

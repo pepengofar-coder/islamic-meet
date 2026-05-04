@@ -35,7 +35,7 @@ export default function AdminUsers() {
   const [sortBy, setSortBy] = useState('joinDate');
   const [actionLoading, setActionLoading] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
-  const [newUser, setNewUser] = useState({ name: '', email: '', gender: 'akhwat', city: '', job: '', education: '' });
+  const [newUser, setNewUser] = useState({ name: '', email: '', gender: 'akhwat', city: '', job: '', education: '', birth_place: '', birth_date: '' });
   const [addLoading, setAddLoading] = useState(false);
   const [verifyToast, setVerifyToast] = useState('');
 
@@ -152,7 +152,7 @@ export default function AdminUsers() {
       const created = await adminAddUser(newUser);
       setAllUsers(prev => [created, ...prev]);
       setShowAddModal(false);
-      setNewUser({ name: '', email: '', gender: 'akhwat', city: '', job: '', education: '' });
+      setNewUser({ name: '', email: '', gender: 'akhwat', city: '', job: '', education: '', birth_place: '', birth_date: '' });
     } catch (err) {
       alert(err.message || 'Gagal menambah user.');
     }
@@ -266,7 +266,7 @@ export default function AdminUsers() {
               <tr>
                 <th>Nama & Email</th>
                 <th>Gender</th>
-                <th>Usia / Kota</th>
+                <th>TTL / Kota</th>
                 <th>Pekerjaan</th>
                 <th>Tier</th>
                 <th>Status</th>
@@ -324,8 +324,8 @@ export default function AdminUsers() {
                       </span>
                     </td>
                     <td>
-                      <p style={{ fontSize: 13, fontWeight: 600, color: '#2D2A4A' }}>{u.age ? `${u.age} tahun` : '—'}</p>
-                      <p style={{ fontSize: 11, color: '#9896B0' }}>{u.city || '—'}</p>
+                      <p style={{ fontSize: 13, fontWeight: 600, color: '#2D2A4A' }}>{(() => { if (!u.birth_date) return '—'; const t = new Date(), b = new Date(u.birth_date); let a = t.getFullYear() - b.getFullYear(); if (t.getMonth() < b.getMonth() || (t.getMonth() === b.getMonth() && t.getDate() < b.getDate())) a--; return `${a} tahun`; })()}</p>
+                      <p style={{ fontSize: 11, color: '#9896B0' }}>{u.birth_place ? `${u.birth_place}` : ''}{u.birth_place && u.city ? ' • ' : ''}{u.city || ''}{!u.birth_place && !u.city ? '—' : ''}</p>
                     </td>
                     <td>
                       <p style={{ fontSize: 13, color: '#2D2A4A' }}>{u.job || '—'}</p>
@@ -447,7 +447,8 @@ export default function AdminUsers() {
                 {[
                   { key: 'name', label: 'Nama Lengkap', placeholder: 'Masukkan nama', required: true },
                   { key: 'email', label: 'Email', placeholder: 'email@contoh.com', type: 'email', required: true },
-                  { key: 'city', label: 'Kota', placeholder: 'Contoh: Bogor' },
+                  { key: 'birth_place', label: 'Tempat Lahir', placeholder: 'Contoh: Jakarta' },
+                  { key: 'city', label: 'Kota Domisili', placeholder: 'Contoh: Bogor' },
                   { key: 'job', label: 'Pekerjaan', placeholder: 'Contoh: Guru' },
                   { key: 'education', label: 'Pendidikan', placeholder: 'Contoh: S1' },
                 ].map(field => (
@@ -464,6 +465,21 @@ export default function AdminUsers() {
                     />
                   </div>
                 ))}
+                <div>
+                  <label style={{ fontSize: 12, fontWeight: 700, color: '#5E5A7A', marginBottom: 4, display: 'block' }}>Tanggal Lahir</label>
+                  <input
+                    type="date"
+                    value={newUser.birth_date}
+                    onChange={e => setNewUser(prev => ({ ...prev, birth_date: e.target.value }))}
+                    style={{ width: '100%', padding: '10px 14px', borderRadius: 12, border: '2px solid #E8E3FF', fontSize: 13, fontFamily: "'Nunito', sans-serif", outline: 'none', boxSizing: 'border-box', colorScheme: 'light' }}
+                  />
+                  {newUser.birth_date && (() => {
+                    const today = new Date(), bd = new Date(newUser.birth_date);
+                    let age = today.getFullYear() - bd.getFullYear();
+                    if (today.getMonth() < bd.getMonth() || (today.getMonth() === bd.getMonth() && today.getDate() < bd.getDate())) age--;
+                    return <p style={{ fontSize: 11, color: '#9896B0', marginTop: 4 }}>Usia: {age} tahun</p>;
+                  })()}
+                </div>
                 <div>
                   <label style={{ fontSize: 12, fontWeight: 700, color: '#5E5A7A', marginBottom: 4, display: 'block' }}>Gender</label>
                   <select
@@ -546,10 +562,12 @@ function UserDetailModal({ user, onClose, onVerify, onSuspend, onSetMembership, 
             {[
               { icon: Mail, label: 'Email', val: user.email || '—' },
               { icon: Calendar, label: 'Tanggal Daftar', val: new Date(user.created_at).toLocaleDateString('id-ID') },
-              { icon: MapPin, label: 'Kota', val: user.city || '—' },
+              { icon: MapPin, label: 'Tempat Lahir', val: user.birth_place || '—' },
+              { icon: Calendar, label: 'Tanggal Lahir', val: user.birth_date ? new Date(user.birth_date).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : '—' },
+              { icon: User, label: 'Usia', val: (() => { if (!user.birth_date) return '—'; const t = new Date(), b = new Date(user.birth_date); let a = t.getFullYear() - b.getFullYear(); if (t.getMonth() < b.getMonth() || (t.getMonth() === b.getMonth() && t.getDate() < b.getDate())) a--; return `${a} tahun`; })() },
+              { icon: MapPin, label: 'Kota Domisili', val: user.city || '—' },
               { icon: GraduationCap, label: 'Pendidikan', val: user.education || '—' },
               { icon: Briefcase, label: 'Pekerjaan', val: user.job || '—' },
-              { icon: User, label: 'Usia', val: user.age ? `${user.age} tahun` : '—' },
             ].map((item, i) => (
               <div key={i} style={{ display: 'flex', gap: 10, alignItems: 'flex-start', padding: '10px 12px', background: '#FAFAF8', borderRadius: 12 }}>
                 <item.icon size={14} color="#9B89CC" style={{ marginTop: 1, flexShrink: 0 }} />

@@ -75,7 +75,16 @@ export default function ProfileView() {
           {profile.name}
         </h1>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-          <span style={{ fontSize: 14, color: 'var(--text-secondary)', fontWeight: 500 }}>{cv.age} tahun</span>
+          <span style={{ fontSize: 14, color: 'var(--text-secondary)', fontWeight: 500 }}>
+            {(() => {
+              if (!cv.birthDate) return '—';
+              const today = new Date();
+              const bd = new Date(cv.birthDate);
+              let a = today.getFullYear() - bd.getFullYear();
+              if (today.getMonth() < bd.getMonth() || (today.getMonth() === bd.getMonth() && today.getDate() < bd.getDate())) a--;
+              return `${a} tahun`;
+            })()}
+          </span>
           <span style={{ color: 'var(--border)' }}>•</span>
           <span style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 14, color: 'var(--text-secondary)', fontWeight: 500 }}>
             <MapPin size={13} /> {cv.city}

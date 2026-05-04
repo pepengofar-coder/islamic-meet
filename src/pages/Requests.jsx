@@ -136,7 +136,7 @@ function RequestCard({ profile, req, type, time, onView, onAccept, onReject, onO
             <span style={{ fontSize: 15, fontWeight: 800, color: 'var(--text-primary)' }}>{(profile.name || '—').split(' ').slice(0, 2).join(' ')}</span>
             <MatchBadge score={profile.matchScore} size="sm" />
           </div>
-          <p style={{ fontSize: 12, color: 'var(--text-muted)' }}>{profile.age ? `${profile.age} th` : ''} • {profile.city || '—'} • {time}</p>
+          <p style={{ fontSize: 12, color: 'var(--text-muted)' }}>{(() => { if (!profile.birth_date) return ''; const t = new Date(), b = new Date(profile.birth_date); let a = t.getFullYear() - b.getFullYear(); if (t.getMonth() < b.getMonth() || (t.getMonth() === b.getMonth() && t.getDate() < b.getDate())) a--; return `${a} th`; })()} • {profile.city || '—'} • {time}</p>
         </div>
         <div style={{ padding: '5px 10px', borderRadius: 20, background: sc.bg, display: 'flex', alignItems: 'center', gap: 5 }}>
           <StatusIcon size={12} color={sc.color} />

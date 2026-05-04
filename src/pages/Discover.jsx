@@ -165,7 +165,7 @@ function ProfileCard({ profile, onPress }) {
           {(profile.name || '—').split(' ').slice(0, 2).join(' ')}
         </p>
         <p style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 8 }}>
-          {cv.age || '—'} th • {(cv.city || '—').split(' ')[0]}
+          {(() => { if (!cv.birthDate) return '—'; const t = new Date(), b = new Date(cv.birthDate); let a = t.getFullYear() - b.getFullYear(); if (t.getMonth() < b.getMonth() || (t.getMonth() === b.getMonth() && t.getDate() < b.getDate())) a--; return a; })()} th • {(cv.city || '—').split(' ')[0]}
         </p>
 
         {/* Tags */}

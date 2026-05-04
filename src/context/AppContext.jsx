@@ -11,7 +11,7 @@ import {
 const AppContext = createContext(null);
 
 const defaultCV = {
-  fullName: '', age: '', city: '', education: '', job: '', incomeRange: '',
+  fullName: '', birthPlace: '', birthDate: '', city: '', education: '', job: '', incomeRange: '',
   salat: '', tilawah: '', mazhab: '', islamicBackground: [], bio: '',
   bloodType: '', smoking: false, hasChronicIllness: false, illnessDetail: '', exercise: '',
   visionLiving: '', visionParenting: '', visionFinance: '', hobbies: [],

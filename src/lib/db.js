@@ -56,8 +56,8 @@ export async function getRequests(userId) {
     .from('taaruf_requests')
     .select(`
       *,
-      from_profile:from_id(id, name, full_name, gender, city, job, education, age),
-      to_profile:to_id(id, name, full_name, gender, city, job, education, age)
+      from_profile:from_id(id, name, full_name, gender, city, job, education, birth_place, birth_date),
+      to_profile:to_id(id, name, full_name, gender, city, job, education, birth_place, birth_date)
     `)
     .or(`from_id.eq.${userId},to_id.eq.${userId}`)
     .order('created_at', { ascending: false });
@@ -123,8 +123,8 @@ export async function getRooms(userId) {
     .from('taaruf_rooms')
     .select(`
       *,
-      user1:user1_id(id, name, full_name, gender, city, job, age),
-      user2:user2_id(id, name, full_name, gender, city, job, age)
+      user1:user1_id(id, name, full_name, gender, city, job, birth_place, birth_date),
+      user2:user2_id(id, name, full_name, gender, city, job, birth_place, birth_date)
     `)
     .or(`user1_id.eq.${userId},user2_id.eq.${userId}`)
     .order('created_at', { ascending: false });
@@ -199,7 +199,8 @@ export function dbProfileToUser(profile) {
     monthly_requests_used: profile.monthly_requests_used || 0,
     cv: {
       fullName: profile.full_name,
-      age: profile.age,
+      birthPlace: profile.birth_place || '',
+      birthDate: profile.birth_date || '',
       city: profile.city,
       education: profile.education,
       job: profile.job,
@@ -238,7 +239,8 @@ export function userToDbProfile(user) {
     readiness_score: user.readinessScore || 0,
     cv_done: user.cvDone || false,
     full_name: user.cv?.fullName || '',
-    age: user.cv?.age || '',
+    birth_place: user.cv?.birthPlace || '',
+    birth_date: user.cv?.birthDate || '',
     city: user.cv?.city || '',
     education: user.cv?.education || '',
     job: user.cv?.job || '',

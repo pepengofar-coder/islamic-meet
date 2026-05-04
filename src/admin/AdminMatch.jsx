@@ -41,8 +41,9 @@ function calcCompatibility(u1, u2) {
 
   // Age range (within 5 years = good, 10 = ok)
   max += 15;
-  const a1 = parseInt(u1.age) || 0;
-  const a2 = parseInt(u2.age) || 0;
+  const calcAge = (bd) => { if (!bd) return 0; const t = new Date(), b = new Date(bd); let a = t.getFullYear() - b.getFullYear(); if (t.getMonth() < b.getMonth() || (t.getMonth() === b.getMonth() && t.getDate() < b.getDate())) a--; return a; };
+  const a1 = calcAge(u1.birth_date);
+  const a2 = calcAge(u2.birth_date);
   if (a1 && a2) {
     const diff = Math.abs(a1 - a2);
     if (diff <= 5) { score += 15; details.push({ label: `Selisih usia ${diff} th`, match: true }); }
@@ -544,7 +545,7 @@ function UserPickerPanel({ title, titleColor, headerBg, users, selected, onSelec
             </div>
             <div>
               <p style={{ fontSize: 12, fontWeight: 700, color: '#1E7A50' }}>{selected.name || '—'}</p>
-              <p style={{ fontSize: 10, color: '#5EC994' }}>{selected.city || '—'} • {selected.age || '—'} th</p>
+              <p style={{ fontSize: 10, color: '#5EC994' }}>{selected.city || '—'} • {(() => { if (!selected.birth_date) return '—'; const t = new Date(), b = new Date(selected.birth_date); let a = t.getFullYear() - b.getFullYear(); if (t.getMonth() < b.getMonth() || (t.getMonth() === b.getMonth() && t.getDate() < b.getDate())) a--; return a; })()} th</p>
             </div>
           </div>
           <button onClick={() => onSelect(null)} style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
@@ -571,7 +572,7 @@ function UserPickerPanel({ title, titleColor, headerBg, users, selected, onSelec
         {users.map(u => {
           const isSelected = selected?.id === u.id;
           const colorIdx = Math.abs((u.id || '').charCodeAt(0)) % avatarGradients.length;
-          const completeness = [u.city, u.age, u.job, u.education, u.salat, u.vision_living].filter(Boolean).length;
+          const completeness = [u.city, u.birth_date, u.job, u.education, u.salat, u.vision_living].filter(Boolean).length;
           return (
             <div
               key={u.id}
@@ -593,7 +594,7 @@ function UserPickerPanel({ title, titleColor, headerBg, users, selected, onSelec
                   <p style={{ fontSize: 11, fontWeight: 700, color: '#2D2A4A', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{u.name || '—'}</p>
                   <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', marginTop: 2 }}>
                     {u.city && <span style={{ fontSize: 9, color: '#9896B0' }}>📍{u.city}</span>}
-                    {u.age && <span style={{ fontSize: 9, color: '#9896B0' }}>• {u.age}th</span>}
+                    {u.birth_date && <span style={{ fontSize: 9, color: '#9896B0' }}>• {(() => { const t = new Date(), b = new Date(u.birth_date); let a = t.getFullYear() - b.getFullYear(); if (t.getMonth() < b.getMonth() || (t.getMonth() === b.getMonth() && t.getDate() < b.getDate())) a--; return a; })()}th</span>}
                     {u.job && <span style={{ fontSize: 9, color: '#9896B0' }}>• {u.job}</span>}
                   </div>
                   {/* Spec completeness bar */}
@@ -755,7 +756,8 @@ function UserSpecDrawer({ user, onClose }) {
         <div style={{ padding: '16px 20px' }}>
           <Section title="📋 Data Pribadi">
             <SpecRow icon={MapPin} label="Kota" value={user.city} />
-            <SpecRow icon={Activity} label="Usia" value={user.age ? `${user.age} tahun` : null} />
+            <SpecRow icon={Activity} label="TTL" value={user.birth_place && user.birth_date ? `${user.birth_place}, ${new Date(user.birth_date).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}` : null} />
+            <SpecRow icon={Activity} label="Usia" value={user.birth_date ? (() => { const t = new Date(), b = new Date(user.birth_date); let a = t.getFullYear() - b.getFullYear(); if (t.getMonth() < b.getMonth() || (t.getMonth() === b.getMonth() && t.getDate() < b.getDate())) a--; return `${a} tahun`; })() : null} />
             <SpecRow icon={Briefcase} label="Pekerjaan" value={user.job} />
             <SpecRow icon={GraduationCap} label="Pendidikan" value={user.education} />
             <SpecRow icon={Wallet} label="Penghasilan" value={user.income_range} />
